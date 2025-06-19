@@ -36,6 +36,10 @@ export class ElectronService {
         return this.api.login(credentials);
     }
 
+    obtenerMangas(): Promise<Manga[]> {
+        return this.api.obtenerMangas();
+    }
+
     guardarManga(manga: Manga): Promise<{ success: boolean; id?: number }> {
         return this.api.guardarManga(manga);
     }
@@ -46,6 +50,10 @@ export class ElectronService {
 
     guardarCapitulo(capitulo: Capitulo): Promise<{ success: boolean; id?: number }> {
         return this.api.guardarCapitulo(capitulo);
+    }
+
+    eliminarManga(id: number): Promise<{ success: boolean }> {
+        return this.api.eliminarManga(id);
     }
 
     // Puedes agregar otros métodos que tengas en electronAPI aquí, por ejemplo:

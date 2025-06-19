@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddMangaDialog } from '../add-manga-dialog/add-manga-dialog';
+import { ElectronService, Manga } from '../../services/electron.service';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -8,31 +10,59 @@ import { AddMangaDialog } from '../add-manga-dialog/add-manga-dialog';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
 
   usuario = {
     nombre: 'Cristian Virago'
   };
 
-  biblioteca = [
-    { id: 1, titulo: 'One Piece', portada: 'assets/onepiece.jpg' },
-    { id: 2, titulo: 'Naruto', portada: 'assets/naruto.jpg' }
-  ];
+  biblioteca: Manga[] = [];
 
-  constructor(private readonly dialog: MatDialog) { }
+  constructor(
+    private readonly dialog: MatDialog,
+    private readonly electronService: ElectronService
+  ) { }
+
+  async ngOnInit() {
+    this.cargarBiblioteca();
+  }
+
+  async cargarBiblioteca() {
+    try {
+      this.biblioteca = await this.electronService.obtenerMangas();
+    } catch (error) {
+      console.error('Error cargando mangas:', error);
+    }
+  }
 
   abrirDialogoAgregarManga() {
     const dialogRef = this.dialog.open(AddMangaDialog);
 
-    dialogRef.afterClosed().subscribe((nuevoManga) => {
+    dialogRef.afterClosed().subscribe(async (nuevoManga) => {
       if (nuevoManga) {
-        this.biblioteca.push(nuevoManga);
+        try {
+          const res = await this.electronService.guardarManga(nuevoManga);
+          if (res.success && res.id) {
+            nuevoManga.id = res.id;
+            this.biblioteca.push(nuevoManga);
+          }
+        } catch (error) {
+          console.error('Error guardando manga:', error);
+        }
       }
     });
   }
 
-  eliminarManga(mangaId: number) {
-    this.biblioteca = this.biblioteca.filter(m => m.id !== mangaId);
+  async eliminarManga(mangaId: number) {
+    try {
+      const res = await this.electronService.eliminarManga(mangaId);
+      if (res.success) {
+        this.biblioteca = this.biblioteca.filter(m => m.id !== mangaId);
+      } else {
+        console.error('No se pudo eliminar el manga');
+      }
+    } catch (error) {
+      console.error('Error eliminando manga:', error);
+    }
   }
-
 }
