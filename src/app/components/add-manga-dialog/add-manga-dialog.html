@@ -1,0 +1,45 @@
+<h1 mat-dialog-title>📚 Agregar Manga</h1>
+
+<div mat-dialog-content class="dialog-content">
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Título</mat-label>
+        <input matInput [(ngModel)]="titulo">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Autor</mat-label>
+        <input matInput [(ngModel)]="autor">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Año de publicación</mat-label>
+        <input matInput type="number" [(ngModel)]="fechaPublicacion">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Género</mat-label>
+        <input matInput [(ngModel)]="genero">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput rows="3" [(ngModel)]="descripcion"></textarea>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>URL de la portada</mat-label>
+        <input matInput [(ngModel)]="portada" (ngModelChange)="onPortadaChange()">
+    </mat-form-field>
+
+    <div class="preview-container" *ngIf="vistaPrevia">
+        <p>Vista previa:</p>
+        <img [src]="vistaPrevia" alt="Vista previa" />
+    </div>
+
+</div>
+
+<div mat-dialog-actions>
+    <button mat-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="guardar()">Guardar</button>
+</div>

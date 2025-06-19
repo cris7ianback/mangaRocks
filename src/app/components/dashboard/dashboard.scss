@@ -1,0 +1,21 @@
+.dashboard-container {
+    padding: 2rem;
+    text-align: center;
+
+    .title {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+    }
+
+    button {
+        margin-bottom: 2rem;
+    }
+
+    .biblioteca {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+}
