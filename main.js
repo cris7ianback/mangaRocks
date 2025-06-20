@@ -2,6 +2,7 @@ const { app, ipcMain } = require('electron');
 const { createWindow } = require('./window');
 const { registerLoginHandlers } = require('./ipc/login');
 const { registerMangaHandlers } = require('./ipc/mangas');
+const { registerCapituloHandlers } = require('./ipc/capitulos');
 require('./db/tables');  // Ejecuta la creación de tablas
 
 let mainWindow;
@@ -11,6 +12,7 @@ function startApp() {
 
     registerLoginHandlers(ipcMain);
     registerMangaHandlers(ipcMain);
+    registerCapituloHandlers(ipcMain);  // <<< ¡No olvides esto!
 
     // Otros handlers...
 }

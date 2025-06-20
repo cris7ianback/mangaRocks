@@ -14,6 +14,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Dashboard } from './components/dashboard/dashboard';
 import { MangaCard } from './components/manga-card/manga-card';
 import { AddMangaDialog } from './components/add-manga-dialog/add-manga-dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ConfirmarEliminacion } from './components/confirmar-eliminacion/confirmar-eliminacion';
+import { MangaDetalle } from './components/manga-detalle/manga-detalle';
+import { AddCapituloDialog } from './components/add-capitulo-dialog/add-capitulo-dialog';
+
 
 @NgModule({
   declarations: [
@@ -21,7 +27,10 @@ import { AddMangaDialog } from './components/add-manga-dialog/add-manga-dialog';
     LoginComponent,
     Dashboard,
     MangaCard,
-    AddMangaDialog
+    AddMangaDialog,
+    ConfirmarEliminacion,
+    MangaDetalle,
+    AddCapituloDialog
   ],
   imports: [
     BrowserModule,
@@ -33,7 +42,9 @@ import { AddMangaDialog } from './components/add-manga-dialog/add-manga-dialog';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    FormsModule
+    FormsModule,
+    MatSnackBarModule,
+    MatDialogModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

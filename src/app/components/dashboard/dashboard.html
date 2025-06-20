@@ -6,7 +6,9 @@
     </button>
 
     <div class="biblioteca">
-        <app-manga-card *ngFor="let manga of biblioteca" [manga]="manga" (eliminar)="eliminarManga($event)">
+        <app-manga-card *ngFor="let manga of biblioteca" [manga]="manga"
+            (eliminar)="eliminarManga($event, manga.titulo)" 
+            (abrirDetalle)="abrirDetallesManga($event)">
         </app-manga-card>
     </div>
 </div>

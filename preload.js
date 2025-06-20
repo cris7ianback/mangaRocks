@@ -1,7 +1,8 @@
-const { contextBridge, ipcRenderer } = require('electron');
+// preload.js
+const { contextBridge, ipcRenderer, shell } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    // Login
+    // Login (ejemplo)
     login: (credentials) => ipcRenderer.invoke('login', credentials),
 
     // Mangas
@@ -10,7 +11,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     eliminarManga: (id) => ipcRenderer.invoke('manga-delete', id),
     actualizarManga: (manga) => ipcRenderer.invoke('manga-update', manga),
 
-    // Capitulos
-    guardarCapitulo: (capitulo) => ipcRenderer.invoke('capitulo-create', capitulo),
-    obtenerCapitulos: (mangaId) => ipcRenderer.invoke('capitulo-list', mangaId)
+    // Capítulos
+    obtenerCapitulos: (mangaId) => ipcRenderer.invoke('capitulo-list', mangaId),
+    guardarCapitulo: (capitulo) => ipcRenderer.invoke('guardarCapitulo', capitulo),
+    eliminarCapitulo: (capituloId) => ipcRenderer.invoke('capitulo-delete', capituloId),
+
+    // Abrir archivo externo si se guarda ruta en disco:
+    abrirArchivo: (ruta) => shell.openPath(ruta)
 });

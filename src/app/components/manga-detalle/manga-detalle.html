@@ -1,0 +1,11 @@
+<h2>Capítulos del manga</h2>
+
+<button mat-raised-button color="primary" (click)="abrirDialogoAgregarCapitulo()">
+    ➕ Agregar Capítulo
+</button>
+
+<ul>
+    <li *ngFor="let capitulo of capitulos">
+        {{ capitulo.titulo }}
+    </li>
+</ul>

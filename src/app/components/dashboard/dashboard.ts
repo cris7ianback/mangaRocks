@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';  // <-- Importa MatSnackBar
 import { AddMangaDialog } from '../add-manga-dialog/add-manga-dialog';
 import { ElectronService, Manga } from '../../services/electron.service';
-
+import { ConfirmarEliminacion } from '../confirmar-eliminacion/confirmar-eliminacion';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: false,
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss'
+  styleUrls: ['./dashboard.scss']  // <-- Corrige a styleUrls (plural)
 })
 export class Dashboard implements OnInit {
 
@@ -20,7 +22,9 @@ export class Dashboard implements OnInit {
 
   constructor(
     private readonly dialog: MatDialog,
-    private readonly electronService: ElectronService
+    private readonly electronService: ElectronService,
+    private readonly snackBar: MatSnackBar,
+    private readonly router: Router
   ) { }
 
   async ngOnInit() {
@@ -53,16 +57,37 @@ export class Dashboard implements OnInit {
     });
   }
 
-  async eliminarManga(mangaId: number) {
-    try {
-      const res = await this.electronService.eliminarManga(mangaId);
-      if (res.success) {
-        this.biblioteca = this.biblioteca.filter(m => m.id !== mangaId);
-      } else {
-        console.error('No se pudo eliminar el manga');
+  async eliminarManga(mangaId: number, titulo: string) {
+    const confirmacion = await this.dialog.open(ConfirmarEliminacion, {
+      data: { titulo },
+      width: '350px'
+    }).afterClosed().toPromise();
+
+    if (confirmacion) {
+      try {
+        const res = await this.electronService.eliminarManga(mangaId);
+        if (res.success) {
+          this.biblioteca = this.biblioteca.filter(m => m.id !== mangaId);
+          this.snackBar.open('✅ Manga eliminado con éxito', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom'
+          });
+        } else {
+          this.snackBar.open('⚠️ No se pudo eliminar el manga', 'Cerrar', {
+            duration: 3000,
+          });
+        }
+      } catch (error) {
+        console.error('Error eliminando manga:', error);
+        this.snackBar.open('❌ Error al eliminar el manga', 'Cerrar', {
+          duration: 3000,
+        });
       }
-    } catch (error) {
-      console.error('Error eliminando manga:', error);
     }
+  }
+
+  abrirDetallesManga(mangaId: number) {
+    this.router.navigate(['/manga', mangaId]);
   }
 }

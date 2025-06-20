@@ -22,8 +22,34 @@ function registerMangaHandlers(ipcMain) {
             });
         });
     });
+    // ✅ Agregar handler para eliminar manga
+    ipcMain.handle('manga-delete', async (event, mangaId) => {
+        return new Promise((resolve, reject) => {
+            db.run('DELETE FROM mangas WHERE id = ?', [mangaId], function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ success: true, deletedId: mangaId });
+                }
+            });
+        });
+    });
 
-    // Agrega aquí manga-update, manga-delete igual
+    // ✅ Agregar handler para actualizar manga
+    ipcMain.handle('manga-update', async (event, manga) => {
+        return new Promise((resolve, reject) => {
+            const { id, titulo, autor, descripcion, añoPublicacion, genero, portada } = manga;
+            db.run(
+                `UPDATE mangas SET titulo = ?, autor = ?, descripcion = ?, añoPublicacion = ?, genero = ?, portada = ? 
+                 WHERE id = ?`,
+                [titulo, autor, descripcion, añoPublicacion, genero, portada, id],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve({ success: true, changes: this.changes });
+                }
+            );
+        });
+    });
 }
 
 module.exports = { registerMangaHandlers };

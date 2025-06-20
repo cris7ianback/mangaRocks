@@ -1,45 +1,42 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { ElectronService } from '../../services/electron.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
   standalone: false,
-  styleUrls: ['./login.scss'],
+  styleUrls: ['./login.scss']
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  hide = true;
-  loading = false;
-  loginError = false;
-
-  username = '';
-  password = '';
-  message = '';
+  username: string = 'admin';
+  password: string = '1234';
+  message: string = '';
 
   constructor(
-    private readonly fb: FormBuilder,
-    private readonly authService: AuthService,
-    private readonly router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      username: ['admin', Validators.required],
-      password: ['1234', Validators.required],
-    });
-  }
+    private readonly electronService: ElectronService,
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar
+  ) { }
 
   async onLogin() {
-    const result = await this.authService.login(this.username, this.password);
-    if (result.success) {
-      this.message = 'Login exitoso ✅';
-      // Redirigir a dashboard o página principal
-      this.router.navigate(['/dashboard']);
-    } else {
-      this.message = result.message ?? 'Login fallido ❌';
+    this.message = '';
+    if (!this.username.trim() || !this.password) {
+      this.message = 'Completa usuario y contraseña';
+      return;
+    }
+    try {
+      const res = await this.electronService.login({ username: this.username, password: this.password });
+      if (res.success) {
+        this.snackBar.open('Bienvenido', 'Cerrar', { duration: 2000 });
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.message = res.message || 'Credenciales incorrectas';
+      }
+    } catch (err) {
+      console.error('Error login:', err);
+      this.message = 'Error de conexión';
     }
   }
-
 }
-

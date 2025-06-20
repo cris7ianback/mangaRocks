@@ -14,8 +14,9 @@ export interface Capitulo {
     id?: number;
     mangaId: number;
     numero: number;
-    titulo?: string;
-    contenido: string;
+    titulo: string;
+    archivo: string;         // nuevo campo para base64
+    // Si ya no usas 'contenido', elimínalo; o si lo usas distinto, manténlo aparte.
 }
 
 export interface LoginCredentials {

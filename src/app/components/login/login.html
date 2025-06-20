@@ -1,7 +1,29 @@
-<div>
-    <h2>Login</h2>
-    <input [(ngModel)]="username" placeholder="Usuario">
-    <input [(ngModel)]="password" placeholder="Contraseña" type="password">
-    <button (click)="onLogin()">Ingresar</button>
-    <p>{{ message }}</p>
+<div class="login-container">
+    <mat-card class="login-card">
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="assets/logo1.png" alt="Logo" class="login-logo" />
+        </div>
+
+        <h1 class="login-title">Iniciar Sesión</h1>
+
+        <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Usuario</mat-label>
+                <input matInput name="username" [(ngModel)]="username" required autocomplete="username" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Contraseña</mat-label>
+                <input matInput name="password" type="password" [(ngModel)]="password" required
+                    autocomplete="current-password" />
+            </mat-form-field>
+
+            <button mat-raised-button class="login-button" [disabled]="!loginForm.form.valid">
+                Ingresar
+            </button>
+        </form>
+
+        <p class="error-message" *ngIf="message">{{ message }}</p>
+    </mat-card>
 </div>

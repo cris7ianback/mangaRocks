@@ -3,30 +3,93 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #000000, #000002);
+    background: #121212;
 }
 
 .login-card {
-    width: 320px;
-    padding: 1rem;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+    width: 360px;
+    padding: 24px;
+    background: #1e1e1e;
     border-radius: 8px;
-    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Contenedor del logo */
+.logo-container {
+    margin-bottom: 16px;
+}
+
+.login-logo {
+    width: 250px;
+    /* Ajusta según el tamaño deseado */
+
+    display: block;
+    margin: 0 auto;
+}
+
+.login-title {
+    margin: 0 0 24px;
+    color: #e0b82e;
+    font-size: 1.5rem;
+    font-weight: 500;
 }
 
 .full-width {
     width: 100%;
+    margin-bottom: 16px;
 }
 
-.button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem;
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: rgba(224, 184, 46, 0.5);
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+    color: #e0b82e;
+}
+
+::ng-deep .mat-input-element {
+    color: #eee;
+}
+
+::ng-deep .mat-form-field-label {
+    color: #aaa !important;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background: #e0b82e;
+    color: #1e1e1e;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.login-button:hover:not([disabled]) {
+    background: #d4a92a;
+}
+
+.login-button:disabled {
+    background: #555;
+    color: #999;
 }
 
 .error-message {
-    margin-top: 1rem;
+    margin-top: 16px;
     color: #f44336;
-    font-weight: 600;
-    text-align: center;
+    font-size: 0.9rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

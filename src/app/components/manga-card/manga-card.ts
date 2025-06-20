@@ -9,9 +9,15 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class MangaCard {
   @Input() manga: any;
   @Output() eliminar = new EventEmitter<number>();
+  @Output() abrirDetalle = new EventEmitter<number>();
 
-  eliminarManga() {
+  eliminarManga(event: MouseEvent) {
+    event.stopPropagation(); // Evita que también se dispare el abrirDetalle
     this.eliminar.emit(this.manga.id);
+  }
+
+  abrirDetalleManga() {
+    this.abrirDetalle.emit(this.manga.id);
   }
 
 }
