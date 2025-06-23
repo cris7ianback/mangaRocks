@@ -1,5 +1,5 @@
-const db = require('../db/connection');
-const bcrypt = require('bcrypt');
+const { db } = require('../db/connection');
+const bcrypt = require('bcryptjs');
 
 function registerLoginHandlers(ipcMain) {
     ipcMain.handle('login', async (event, { username, password }) => {

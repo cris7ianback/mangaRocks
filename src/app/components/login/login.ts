@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class LoginComponent {
   username: string = 'admin';
-  password: string = '1234';
+  password: string = 'admin123';
   message: string = '';
 
   constructor(

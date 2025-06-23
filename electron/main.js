@@ -4,8 +4,11 @@ const { createWindow } = require('./window');
 const { registerLoginHandlers } = require('./ipc/login');
 const { registerMangaHandlers } = require('./ipc/mangas');
 const { registerCapituloHandlers } = require('./ipc/capitulos');
-const { registerCbrHandlers } = require('./ipc/cbr');  // <-- importa el nuevo handler
-require('./db/tables');  // Ejecuta la creación de tablas
+const { registerCbrHandlers } = require('./ipc/cbr');
+
+// ✅ Llamar inicialización completa de base de datos
+const { inicializarBaseDeDatos } = require('./db/initDatabase');
+inicializarBaseDeDatos(); // ← solo esto, sin require('./db/tables')
 
 let mainWindow;
 
@@ -15,51 +18,23 @@ function startApp() {
 
     registerLoginHandlers(ipcMain);
     registerMangaHandlers(ipcMain);
-    registerCapituloHandlers(ipcMain);  // UNA vez
+    registerCapituloHandlers(ipcMain);
     registerCbrHandlers(ipcMain);
-
-
-    // Otros handlers...
 }
 
 app.whenReady().then(() => {
-    // Registro del protocolo localfile personalizado
     protocol.registerFileProtocol('localfile', (request, callback) => {
         try {
-            let url = request.url;
-            console.log('URL original:', url);
-
-            if (url.startsWith('localfile://')) {
-                url = url.slice('localfile://'.length);
-            }
-            console.log('Después de eliminar localfile://:', url);
-
-            if (url.startsWith('/')) {
-                url = url.slice(1);
-            }
-            console.log('Después de eliminar "/" inicial:', url);
-
-            url = decodeURIComponent(url);
-            console.log('Después de decodeURIComponent:', url);
-
-            // Detecta letra de unidad seguida de / o \ sin los dos puntos
+            let url = decodeURIComponent(request.url.replace('localfile://', '').replace(/^\/+/, ''));
             if (/^[a-zA-Z][\\/]/.test(url) && !/^[a-zA-Z]:[\\/]/.test(url)) {
                 url = url[0] + ':' + url.slice(1);
-                console.log('Después de agregar ":" a la unidad:', url);
             }
-
             const fullPath = path.normalize(url);
-            console.log('Ruta final normalizada:', fullPath);
-
             callback({ path: fullPath });
         } catch (error) {
             console.error('Error en protocolo localfile:', error);
         }
     });
-
-
-
-
 
     startApp();
 });

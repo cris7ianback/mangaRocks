@@ -36,31 +36,6 @@ export class MangaDetalle implements OnInit {
     await this.cargarTitulo();
   }
 
-  // async cargarCapitulos() {
-  //   try {
-  //     this.capitulos = await this.electronService.obtenerCapitulos(this.mangaId);
-
-  //     for (const c of this.capitulos) {
-  //       const paginaIdx = +(localStorage.getItem(`paginaActual_${c.id}`) || '0');
-  //       let paginas = JSON.parse(localStorage.getItem(`paginas_${c.id}`) || '[]');
-
-  //       if (paginas.length === 0 && c.archivoPath) {
-  //         try {
-  //           const extraidas = await this.electronService.extraerPaginasDesdeArchivo(c.archivoPath);
-  //           paginas = this.normalizarRutasLocalfile(extraidas);
-  //           localStorage.setItem(`paginas_${c.id}`, JSON.stringify(paginas));
-  //         } catch (error) {
-  //           console.warn('No se pudieron extraer páginas al cargar:', error);
-  //         }
-  //       }
-
-  //       c.miniatura = paginas.length > 0 ? paginas[paginaIdx] : null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error cargando capítulos:', error);
-  //   }
-  // }
-
   async cargarCapitulos() {
     try {
       this.capitulos = await this.electronService.obtenerCapitulos(this.mangaId);

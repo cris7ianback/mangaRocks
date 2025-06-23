@@ -7,19 +7,19 @@
     "build": "ng build",
     "electron": "ng build && electron .",
     "electron:dev": "cross-env ELECTRON_START_URL=http://localhost:4200 electron .",
-    "build:electron": "ng build && electron-builder"
+    "build:electron": "ng build && electron-builder",
+    "postinstall": "chmod +x ./node_modules/7zip-bin/mac/arm64/7za"
   },
   "build": {
     "appId": "com.mangastudio.mangarocks",
     "productName": "Manga Rocks",
-    "files": [
-      "dist/**/*",
-      "db/",
-      "main.js",
-      "window.js",
-      "ipc/**/*",
-      "package.json"
-    ],
+"files": [
+  "dist/mangaRocks/**",   
+  "electron/**/*",        
+  "!electron/archivos/**",
+  "package.json"
+],
+
     "directories": {
       "buildResources": "assets"
     },
@@ -31,7 +31,11 @@
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+      "asarUnpack": [
+        "**/archivos/**",
+    "**/node_modules/7zip-bin/**"
+  ]
   },
   "private": true,
   "dependencies": {
@@ -45,7 +49,7 @@
     "@angular/router": "^20.0.0",
     "7zip-bin": "^5.2.0",
     "adm-zip": "^0.5.16",
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
     "rxjs": "~7.8.0",
     "sqlite3": "^5.1.7",
     "tslib": "^2.3.0",

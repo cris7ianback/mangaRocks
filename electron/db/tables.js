@@ -1,4 +1,5 @@
-const db = require('./connection');
+const { db } = require('./connection');  // IMPORTANTE: desestructurar aquí
+
 
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS usuarios (
