@@ -1,12 +1,37 @@
 {
   "name": "manga-rocks",
   "version": "0.0.0",
-  "main": "main.js",
+  "main": "electron/main.js",
   "scripts": {
     "start": "ng serve",
     "build": "ng build",
     "electron": "ng build && electron .",
-    "electron:dev": "cross-env ELECTRON_START_URL=http://localhost:4200 electron ."
+    "electron:dev": "cross-env ELECTRON_START_URL=http://localhost:4200 electron .",
+    "build:electron": "ng build && electron-builder"
+  },
+  "build": {
+    "appId": "com.mangastudio.mangarocks",
+    "productName": "Manga Rocks",
+    "files": [
+      "dist/**/*",
+      "db/",
+      "main.js",
+      "window.js",
+      "ipc/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "private": true,
   "dependencies": {
@@ -35,6 +60,7 @@
     "@types/node": "^24.0.3",
     "cross-env": "^7.0.3",
     "electron": "^36.4.0",
+    "electron-builder": "^26.0.12",
     "electron-reload": "^2.0.0-alpha.1",
     "jasmine-core": "~5.7.0",
     "karma": "~6.4.0",
