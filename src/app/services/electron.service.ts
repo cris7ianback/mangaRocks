@@ -28,6 +28,18 @@ export interface LoginCredentials {
     providedIn: 'root'
 })
 export class ElectronService {
+
+    ipcRenderer: any;
+
+    constructor() {
+        if ((window as any).require) {
+            try {
+                this.ipcRenderer = (window as any).require('electron').ipcRenderer;
+            } catch (e) {
+                console.warn('Electron\'s IPC was not loaded');
+            }
+        }
+    }
     private get api() {
         if (window.electronAPI) return window.electronAPI;
         throw new Error('electronAPI no está disponible');
@@ -56,6 +68,19 @@ export class ElectronService {
     eliminarManga(id: number): Promise<{ success: boolean }> {
         return this.api.eliminarManga(id);
     }
+
+    async eliminarCapitulo(id: number): Promise<{ success: boolean }> {
+        return window.electronAPI.eliminarCapitulo(id);
+    }
+
+    extraerPaginasDesdeArchivo(archivoPath: string): Promise<string[]> {
+        return this.api.extraerPaginasDesdeArchivo(archivoPath);
+    }
+
+    actualizarManga(manga: Manga): Promise<any> {
+        return window.electronAPI.actualizarManga(manga);
+    }
+
 
     // Puedes agregar otros métodos que tengas en electronAPI aquí, por ejemplo:
     // obtenerMangas(): Promise<Manga[]> {

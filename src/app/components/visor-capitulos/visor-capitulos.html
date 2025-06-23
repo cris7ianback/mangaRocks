@@ -1,0 +1,20 @@
+<div class="visor-container">
+    <button class="btn cerrar-btn" (click)="cerrarVisor()" aria-label="Cerrar visor">×</button>
+
+    <button class="btn flecha-btn izquierda" (click)="anterior()" [disabled]="paginaActual === 0">
+        <mat-icon>arrow_back_ios</mat-icon>
+    </button>
+
+    <div class="pagina-container">
+        <img [src]="paginas[paginaActual]" (load)="onImagenCargada($event)" class="pagina-img"
+            [class.animar]="animarImagen" [class.horizontal]="esHorizontal" alt="Página {{ paginaActual + 1 }}" />
+    </div>
+
+    <button class="btn flecha-btn derecha" (click)="siguiente()" [disabled]="paginaActual === paginas.length - 1">
+        <mat-icon>arrow_forward_ios</mat-icon>
+    </button>
+</div>
+
+<div class="contador-paginas">
+    Página {{ paginaActual + 1 }} de {{ paginas.length }}
+</div>

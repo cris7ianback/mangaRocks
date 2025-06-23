@@ -10,6 +10,7 @@ export class MangaCard {
   @Input() manga: any;
   @Output() eliminar = new EventEmitter<number>();
   @Output() abrirDetalle = new EventEmitter<number>();
+  @Output() editar = new EventEmitter<number>();
 
   eliminarManga(event: MouseEvent) {
     event.stopPropagation(); // Evita que también se dispare el abrirDetalle
@@ -18,6 +19,11 @@ export class MangaCard {
 
   abrirDetalleManga() {
     this.abrirDetalle.emit(this.manga.id);
+  }
+
+  editarManga(event: MouseEvent) {
+    event.stopPropagation();
+    this.editar.emit(this.manga.id);
   }
 
 }

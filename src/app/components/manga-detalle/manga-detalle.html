@@ -1,11 +1,48 @@
-<h2>Capítulos del manga</h2>
+<div class="banner-portada" *ngIf="portadaBanner">
+    <div class="overlay"></div>
+    <img [src]="portadaBanner" alt="{{ mangaTitulo }}" />
+    <div class="titulo-en-banner">{{ mangaTitulo }}</div>
+</div>
 
+<!-- Botón para agregar capítulo -->
 <button mat-raised-button color="primary" (click)="abrirDialogoAgregarCapitulo()">
     ➕ Agregar Capítulo
 </button>
 
-<ul>
-    <li *ngFor="let capitulo of capitulos">
-        {{ capitulo.titulo }}
-    </li>
-</ul>
+<!-- Botón para volver al home -->
+<button mat-stroked-button color="primary" (click)="volverHome()">
+    ← Volver al Inicio
+</button>
+
+<!-- Lista de capítulos en estilo card minimalista y clickeable para seleccionar -->
+<div class="capitulos-grid" *ngIf="capitulos.length > 0; else sinCapitulos">
+    <mat-card *ngFor="let capitulo of capitulos" class="capitulo-card" (click)="abrirVisor(capitulo)"
+        [ngClass]="{ 'leido': capitulo.leido }">
+
+        <!-- 🟡 Overlay si está leído -->
+        <div class="overlay-leido" *ngIf="capitulo.leido">
+            📖 Leído
+        </div>
+
+        <img *ngIf="capitulo.miniatura" [src]="capitulo.miniatura" class="miniatura" alt="" />
+
+        <mat-card-header>
+            <mat-card-title>{{ capitulo.titulo }}</mat-card-title>
+            <mat-card-subtitle>{{ capitulo.titulo }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-actions>
+            <button mat-icon-button color="warn" (click)="eliminarCapitulo(capitulo); $event.stopPropagation()">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </mat-card-actions>
+    </mat-card>
+
+</div>
+
+
+
+<!-- Texto cuando no hay capítulos -->
+<ng-template #sinCapitulos>
+    <p>No hay capítulos agregados aún.</p>
+</ng-template>

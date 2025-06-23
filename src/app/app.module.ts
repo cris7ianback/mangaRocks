@@ -13,12 +13,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Dashboard } from './components/dashboard/dashboard';
 import { MangaCard } from './components/manga-card/manga-card';
-import { AddMangaDialog } from './components/add-manga-dialog/add-manga-dialog';
+import { MangaDialog } from './components/manga-dialog/manga-dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ConfirmarEliminacion } from './components/confirmar-eliminacion/confirmar-eliminacion';
 import { MangaDetalle } from './components/manga-detalle/manga-detalle';
 import { AddCapituloDialog } from './components/add-capitulo-dialog/add-capitulo-dialog';
+import { MatListModule } from '@angular/material/list';
+import { VisorCapitulos } from './components/visor-capitulos/visor-capitulos';
 
 
 @NgModule({
@@ -27,10 +29,11 @@ import { AddCapituloDialog } from './components/add-capitulo-dialog/add-capitulo
     LoginComponent,
     Dashboard,
     MangaCard,
-    AddMangaDialog,
+    MangaDialog,
     ConfirmarEliminacion,
     MangaDetalle,
-    AddCapituloDialog
+    AddCapituloDialog,
+    VisorCapitulos
   ],
   imports: [
     BrowserModule,
@@ -44,7 +47,9 @@ import { AddCapituloDialog } from './components/add-capitulo-dialog/add-capitulo
     MatProgressSpinnerModule,
     FormsModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
+    MatListModule
+
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

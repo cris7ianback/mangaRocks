@@ -1,0 +1,189 @@
+/* Contenedor portada */
+.portada-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.portada-img {
+    max-width: 300px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+/* Grid de capítulos */
+.capitulos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px; // ⬅️ Margen general alrededor del grid
+}
+
+/* Card de capítulo estilo oscuro minimalista */
+.capitulo-card {
+    background-color: #1e1e1e;
+    color: white;
+    border: 1px solid #333;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    &:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    }
+
+    img {
+        width: 100%;
+        height: auto; // ⬅️ Muestra toda la portada completa
+        object-fit: contain; // ⬅️ No recorta imagen, ajusta bien
+        background-color: #121212;
+        padding: 6px;
+    }
+
+    mat-card-content {
+        padding: 0.75rem 1rem;
+
+        h3 {
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 500;
+        }
+    }
+
+    mat-card-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Miniaturas en visor */
+.visor-paginas {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+.pagina-img {
+    max-width: 150px;
+    max-height: 200px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+}
+
+/* Botones espaciados */
+button[mat-raised-button],
+button[mat-stroked-button] {
+    margin-right: 12px;
+    margin-top: 10px;
+}
+
+/* Título y mensaje */
+h2 {
+    font-weight: 600;
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+p {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    margin-top: 30px;
+}
+
+.banner-portada {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; // <- Puedes usar "cover" o "center" según lo que quieras resaltar
+        object-position: center 30%; // ← Ajusta la parte visible (por ejemplo, 30% baja un poco)
+        display: block;
+        filter: brightness(0.6);
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.95));
+    }
+
+    .titulo-en-banner {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #fff;
+        font-size: 2rem;
+        font-weight: 600;
+        text-align: center;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        padding: 0 1rem;
+    }
+}
+
+.capitulo-card.leido {
+    opacity: 0.6;
+    position: relative;
+}
+
+// .capitulo-card.leido::after {
+//     content: "✓ Leído";
+//     position: absolute;
+//     top: 8px;
+//     right: 12px;
+//     background-color: #4caf50;
+//     color: white;
+//     font-size: 0.7rem;
+//     padding: 2px 6px;
+//     border-radius: 4px;
+// }
+
+.overlay-leido {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); // oscuro sin desenfoque
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 1px 3px black;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 12px;
+    transition: opacity 0.3s ease;
+}

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';  // <-- Importa MatSnackBar
-import { AddMangaDialog } from '../add-manga-dialog/add-manga-dialog';
+import { MangaDialog } from '../manga-dialog/manga-dialog';
 import { ElectronService, Manga } from '../../services/electron.service';
 import { ConfirmarEliminacion } from '../confirmar-eliminacion/confirmar-eliminacion';
 import { Router } from '@angular/router';
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   selector: 'app-dashboard',
   standalone: false,
   templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.scss']  // <-- Corrige a styleUrls (plural)
+  styleUrls: ['./dashboard.scss']
 })
 export class Dashboard implements OnInit {
 
@@ -33,29 +33,48 @@ export class Dashboard implements OnInit {
 
   async cargarBiblioteca() {
     try {
-      this.biblioteca = await this.electronService.obtenerMangas();
+      this.electronService.obtenerMangas().then(mangas => {
+        this.biblioteca = mangas.sort((a, b) =>
+          a.titulo.localeCompare(b.titulo, 'es', { sensitivity: 'base' })
+        );
+      });
     } catch (error) {
       console.error('Error cargando mangas:', error);
     }
   }
 
   abrirDialogoAgregarManga() {
-    const dialogRef = this.dialog.open(AddMangaDialog);
+    const dialogRef = this.dialog.open(MangaDialog, {
+      width: '600px',
+      data: null
+    });
 
-    dialogRef.afterClosed().subscribe(async (nuevoManga) => {
-      if (nuevoManga) {
-        try {
-          const res = await this.electronService.guardarManga(nuevoManga);
-          if (res.success && res.id) {
-            nuevoManga.id = res.id;
-            this.biblioteca.push(nuevoManga);
-          }
-        } catch (error) {
-          console.error('Error guardando manga:', error);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.biblioteca.push(result);
+      }
+    });
+  }
+
+  abrirDialogoEditarManga(mangaId: number) {
+    const manga = this.biblioteca.find(m => m.id === mangaId);
+    if (!manga) return;
+
+    const dialogRef = this.dialog.open(MangaDialog, {
+      width: '600px',
+      data: manga
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const index = this.biblioteca.findIndex(m => m.id === result.id);
+        if (index !== -1) {
+          this.biblioteca[index] = result;
         }
       }
     });
   }
+
 
   async eliminarManga(mangaId: number, titulo: string) {
     const confirmacion = await this.dialog.open(ConfirmarEliminacion, {

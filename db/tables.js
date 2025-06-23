@@ -17,13 +17,12 @@ db.serialize(() => {
     portada TEXT
   )`);
 
-  // Crear tabla capitulos si no existe
   db.run(`CREATE TABLE IF NOT EXISTS capitulos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     mangaId INTEGER NOT NULL,
     numero INTEGER NOT NULL,
     titulo TEXT,
-    archivoBase64 TEXT,
+    archivoPath TEXT,
     FOREIGN KEY(mangaId) REFERENCES mangas(id) ON DELETE CASCADE
   )`);
 });

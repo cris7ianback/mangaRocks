@@ -1,5 +1,4 @@
 <div class="dashboard-container">
-    <h2 class="title">Bienvenido, {{ usuario.nombre }}</h2>
 
     <button mat-raised-button color="primary" (click)="abrirDialogoAgregarManga()">
         ➕ Agregar Manga
@@ -7,8 +6,8 @@
 
     <div class="biblioteca">
         <app-manga-card *ngFor="let manga of biblioteca" [manga]="manga"
-            (eliminar)="eliminarManga($event, manga.titulo)" 
-            (abrirDetalle)="abrirDetallesManga($event)">
+            (eliminar)="eliminarManga($event, manga.titulo)" (abrirDetalle)="abrirDetallesManga($event)"
+            (editar)="abrirDialogoEditarManga($event)">
         </app-manga-card>
     </div>
 </div>

@@ -1,4 +1,3 @@
-// preload.js
 const { contextBridge, ipcRenderer, shell } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -15,6 +14,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     obtenerCapitulos: (mangaId) => ipcRenderer.invoke('capitulo-list', mangaId),
     guardarCapitulo: (capitulo) => ipcRenderer.invoke('guardarCapitulo', capitulo),
     eliminarCapitulo: (capituloId) => ipcRenderer.invoke('capitulo-delete', capituloId),
+    extraerPaginasDesdeArchivo: (archivoPath) => ipcRenderer.invoke('extraerPaginasDesdeArchivo', archivoPath),
 
     // Abrir archivo externo si se guarda ruta en disco:
     abrirArchivo: (ruta) => shell.openPath(ruta)

@@ -2,8 +2,13 @@
     <img mat-card-image [src]="manga.portada" alt="{{ manga.titulo }}">
     <mat-card-content>
         <h3>{{ manga.titulo }}</h3>
+        <p>{{ manga.autor }}</p>
     </mat-card-content>
     <mat-card-actions>
+
+        <button mat-icon-button color="primary" (click)="editarManga($event)">
+            <mat-icon>edit</mat-icon>
+        </button>
         <button mat-icon-button color="warn" (click)="eliminarManga($event)" aria-label="Eliminar manga">
             <mat-icon>delete</mat-icon>
         </button>

@@ -1,6 +1,5 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Capitulo } from '../../services/electron.service';
 
 @Component({
   selector: 'app-add-capitulo-dialog',
@@ -9,50 +8,40 @@ import { Capitulo } from '../../services/electron.service';
   styleUrls: ['./add-capitulo-dialog.scss']
 })
 export class AddCapituloDialog {
-  titulo: string = '';
-  fileData: File | null = null;
-  numero!: number;
-  fileBase64: string | null = null;
-  archivo: any;
+  titulo = '';
+  archivoSeleccionado: File | null = null;
 
   constructor(
     public dialogRef: MatDialogRef<AddCapituloDialog>,
     @Inject(MAT_DIALOG_DATA) public data: { mangaId: number }
   ) { }
 
-  async ngOnInit() {
-    // Opcional: asignar automáticamente siguiente número
-    // try {
-    //   const lista = await this.electronService.obtenerCapitulos(this.data.mangaId);
-    //   this.numero = lista.length + 1;
-    // } catch {
-    //   this.numero = 1;
-    // }
-  }
-
-  onFileSelected(event: Event) {
+  onArchivoSeleccionado(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.fileData = input.files[0];
+    if (input.files?.length) {
+      this.archivoSeleccionado = input.files[0];
+    }
+  }
+
+  archivoAArrayBuffer(archivo: File): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => this.fileBase64 = reader.result as string;
-      reader.readAsDataURL(this.fileData);
-    }
+      reader.onload = () => resolve(reader.result as ArrayBuffer);
+      reader.onerror = err => reject(err);
+      reader.readAsArrayBuffer(archivo);
+    });
   }
 
-  guardar() {
-    if (this.titulo.trim() && this.fileBase64 && this.numero != null) {
-      const nuevo: Capitulo = {
-        mangaId: this.data.mangaId,
-        numero: this.numero,
-        titulo: this.titulo,
-        archivo: this.fileBase64
-      };
-      this.dialogRef.close(nuevo);
-    }
-  }
+  async guardar() {
+    if (!this.archivoSeleccionado || !this.titulo) return;
 
-  cancelar() {
-    this.dialogRef.close();
+    const buffer = await this.archivoAArrayBuffer(this.archivoSeleccionado);
+    // Envía buffer directamente, usando el método adecuado:
+    this.dialogRef.close({
+      titulo: this.titulo,
+      mangaId: this.data.mangaId,
+      archivoNombreOriginal: this.archivoSeleccionado.name,
+      archivoBuffer: buffer // aquí envías el ArrayBuffer directamente
+    });
   }
 }
