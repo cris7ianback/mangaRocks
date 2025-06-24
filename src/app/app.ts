@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -8,4 +9,12 @@ import { Component } from '@angular/core';
 })
 export class App {
   protected title = 'mangaRocks';
+  loading$: any;
+
+
+  constructor(private readonly loadingService: LoadingService) {
+    this.loading$ = this.loadingService.loading$;
+  }
+
+
 }

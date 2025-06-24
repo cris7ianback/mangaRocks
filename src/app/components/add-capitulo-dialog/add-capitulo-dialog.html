@@ -1,14 +1,21 @@
-<h2>Agregar Capítulo</h2>
+<h2 class="titulo-form">Agregar Capítulo</h2>
 
-<form #form="ngForm" (ngSubmit)="guardar()">
-    <mat-form-field appearance="fill">
+<form #form="ngForm" (ngSubmit)="guardar()" class="form-capitulo">
+    <mat-form-field appearance="outline" class="form-field">
         <mat-label>Título del capítulo</mat-label>
         <input matInput [(ngModel)]="titulo" name="titulo" required />
     </mat-form-field>
 
-    <input type="file" (change)="onArchivoSeleccionado($event)" accept=".cbr,.cbz" required />
+    <div class="file-input-container">
+        <label for="archivo" class="file-label">
+            <mat-icon>upload_file</mat-icon>
+            <span>{{ archivoSeleccionado ? archivoSeleccionado.name : 'Seleccionar archivo (.cbr, .cbz)' }}</span>
+        </label>
+        <input id="archivo" type="file" (change)="onArchivoSeleccionado($event)" accept=".cbr,.cbz" required hidden />
+    </div>
 
-    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid || !archivoSeleccionado">
+    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid || !archivoSeleccionado"
+        class="btn-guardar">
         Guardar
     </button>
 </form>

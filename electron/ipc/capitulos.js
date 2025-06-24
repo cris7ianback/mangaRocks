@@ -1,4 +1,3 @@
-// capitulo.js
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -6,22 +5,21 @@ const os = require('os');
 const crypto = require('crypto');
 const { db } = require('../db/connection');
 const { guardarArchivoCBR } = require('../utils/fileHelper');
-const { app } = require('electron');
+const { app, ipcMain } = require('electron');  // <--- Aquí importa ipcMain
 const { path7za } = require('7zip-bin');
 
 // Ruta base donde se guardan los archivos .cbr (ajusta según tu estructura)
-const baseArchivosPath = path.join(__dirname, 'electron', 'archivos');
-
+const baseArchivosPath = path.resolve(__dirname, '..', 'archivos');
+console.log('Base archivos path:', baseArchivosPath);
 
 function getRuta7za() {
-    const base = app.isPackaged
-        ? path.join(process.resourcesPath, 'app.asar.unpacked')
-        : path.join(__dirname, '..');
-
-    return path.join(base, 'node_modules', '7zip-bin', 'mac', 'arm64', '7za');
+    if (app.isPackaged) {
+        return path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules', '7zip-bin', 'win', 'x64', '7za.exe');
+    } else {
+        return path7za;
+    }
 }
 
-// Listar imágenes recursivamente por extensiones
 function listarArchivosRecursivo(dir, extensiones) {
     let resultados = [];
     const list = fs.readdirSync(dir, { withFileTypes: true });
@@ -38,39 +36,58 @@ function listarArchivosRecursivo(dir, extensiones) {
     return resultados;
 }
 
-// Extraer páginas desde un archivo .cbr usando 7-Zip
+
+
 function extraerPaginasDesdeArchivo(archivoPath) {
+    console.log('🗂 [extraerPaginasDesdeArchivo] Archivo recibido:', archivoPath);
+    console.log('📁 [extraerPaginasDesdeArchivo] ¿Existe el archivo?', fs.existsSync(archivoPath));
+
     return new Promise((resolve, reject) => {
         const tempDir = path.join(os.tmpdir(), 'manga_extract_' + crypto.randomBytes(6).toString('hex'));
+        console.log('📂 [extraerPaginasDesdeArchivo] Carpeta temporal de extracción:', tempDir);
 
         if (!fs.existsSync(tempDir)) {
             fs.mkdirSync(tempDir, { recursive: true });
+            console.log('📁 [extraerPaginasDesdeArchivo] Carpeta creada:', tempDir);
+        } else {
+            console.log('📁 [extraerPaginasDesdeArchivo] Carpeta ya existe:', tempDir);
         }
 
         const ruta7z = `"${getRuta7za()}"`;
-        const comando = `${ruta7z} x "${archivoPath}" -o"${tempDir}" -y`;
+        console.log('🧰 [extraerPaginasDesdeArchivo] Ruta 7za:', ruta7z);
 
-        console.log('Ejecutando:', comando);
+        const comando = `${ruta7z} x "${archivoPath}" -o"${tempDir}" -y`;
+        console.log('⚙️ [extraerPaginasDesdeArchivo] Comando ejecutado:', comando);
 
         exec(comando, (error, stdout, stderr) => {
+            console.log('📤 [extraerPaginasDesdeArchivo] STDOUT:', stdout);
+            console.log('📥 [extraerPaginasDesdeArchivo] STDERR:', stderr);
+
             if (error) {
+                console.error('❌ [extraerPaginasDesdeArchivo] Error ejecutando comando:', error.message);
                 return reject(new Error(`Error extrayendo archivo: ${stderr || error.message}`));
             }
 
-            console.log('Extracción completada en:', tempDir);
-
             const extensionesPermitidas = ['.jpg', '.jpeg', '.png'];
             let archivosImagenes;
+
             try {
                 archivosImagenes = listarArchivosRecursivo(tempDir, extensionesPermitidas);
+                console.log('🖼️ [extraerPaginasDesdeArchivo] Archivos extraídos:', archivosImagenes.length);
             } catch (e) {
+                console.error('❌ [extraerPaginasDesdeArchivo] Error listando archivos extraídos:', e.message);
                 return reject(e);
             }
+
+            archivosImagenes.forEach((img, idx) => {
+                console.log(`🖼️ Imagen ${idx + 1}:`, img);
+            });
 
             const paginas = archivosImagenes
                 .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
                 .map(f => 'localfile://' + f);
 
+            console.log('📚 [extraerPaginasDesdeArchivo] Total páginas listas:', paginas.length);
             resolve(paginas);
         });
     });
@@ -78,7 +95,6 @@ function extraerPaginasDesdeArchivo(archivoPath) {
 
 
 
-// Registro de handlers
 function registerCapituloHandlers(ipcMain) {
     ipcMain.handle('capitulo-list', async (event, mangaId) => {
         return new Promise((resolve, reject) => {
@@ -135,31 +151,68 @@ function registerCapituloHandlers(ipcMain) {
 
     ipcMain.handle('capitulo-delete', async (event, capituloId) => {
         return new Promise((resolve, reject) => {
-            db.run('DELETE FROM capitulos WHERE id = ?', [capituloId], function (err) {
-                if (err) reject(err);
-                else resolve({ success: true });
+            // Primero obtener el path del archivo a borrar
+            db.get('SELECT archivoPath FROM capitulos WHERE id = ?', [capituloId], (err, row) => {
+                if (err) return reject(err);
+                if (!row) return reject(new Error('Capítulo no encontrado'));
+
+                const archivoPath = row.archivoPath;
+
+                // Borrar archivo en disco si existe
+                fs.unlink(archivoPath, (fsErr) => {
+                    if (fsErr && fsErr.code !== 'ENOENT') {
+                        console.warn('No se pudo borrar archivo:', archivoPath, fsErr.message);
+                        // No bloqueamos la eliminación en BD, solo avisamos
+                    }
+
+                    // Ahora borrar la fila en BD
+                    db.run('DELETE FROM capitulos WHERE id = ?', [capituloId], function (dbErr) {
+                        if (dbErr) reject(dbErr);
+                        else resolve({ success: true });
+                    });
+                });
             });
         });
     });
 
+
     ipcMain.handle('extraerPaginasDesdeArchivo', async (event, archivoPath) => {
         console.log('📥 extraerPaginasDesdeArchivo llamado con:', archivoPath);
 
-        // Convertir a ruta absoluta si es relativa
-        let rutaCompleta = archivoPath;
-        if (!path.isAbsolute(archivoPath)) {
-            rutaCompleta = path.join(baseArchivosPath, archivoPath);
+        archivoPath = decodeURI(archivoPath);  // 👈 muy importante si usas rutas codificadas
+        let rutaCompleta = path.isAbsolute(archivoPath)
+            ? archivoPath
+            : path.join(baseArchivosPath, archivoPath);
+
+        console.log('📁 Ruta completa procesada:', rutaCompleta);
+        if (!fs.existsSync(rutaCompleta)) {
+            console.error('❌ Archivo no existe:', rutaCompleta);
+            throw new Error('Archivo no encontrado: ' + rutaCompleta);
         }
 
+        const rutaTempArchivo = path.join(os.tmpdir(), 'manga_tmp_' + crypto.randomBytes(6).toString('hex') + path.extname(rutaCompleta));
+
         try {
-            const paginas = await extraerPaginasDesdeArchivo(rutaCompleta);
+            fs.copyFileSync(rutaCompleta, rutaTempArchivo);
+            console.log('📄 Archivo copiado a:', rutaTempArchivo);
+
+            const paginas = await extraerPaginasDesdeArchivo(rutaTempArchivo);
             console.log('🖼️ Páginas extraídas:', paginas.length);
             return paginas;
         } catch (error) {
             console.error('❌ Error en extraerPaginasDesdeArchivo:', error);
             throw error;
+        } finally {
+            if (fs.existsSync(rutaTempArchivo)) {
+                fs.unlink(rutaTempArchivo, err => {
+                    if (err) console.warn('⚠️ No se pudo eliminar:', rutaTempArchivo);
+                    else console.log('🧹 Temporal eliminado:', rutaTempArchivo);
+                });
+            }
         }
     });
+
+
 }
 
 module.exports = { registerCapituloHandlers };

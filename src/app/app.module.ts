@@ -21,6 +21,9 @@ import { MangaDetalle } from './components/manga-detalle/manga-detalle';
 import { AddCapituloDialog } from './components/add-capitulo-dialog/add-capitulo-dialog';
 import { MatListModule } from '@angular/material/list';
 import { VisorCapitulos } from './components/visor-capitulos/visor-capitulos';
+import { LoadingOverlay } from './shared/loading-overlay/loading-overlay';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { LoadingInterceptor } from './interceptors/loading.interceptor';
 
 
 @NgModule({
@@ -33,7 +36,8 @@ import { VisorCapitulos } from './components/visor-capitulos/visor-capitulos';
     ConfirmarEliminacion,
     MangaDetalle,
     AddCapituloDialog,
-    VisorCapitulos
+    VisorCapitulos,
+    LoadingOverlay
   ],
   imports: [
     BrowserModule,
@@ -48,10 +52,16 @@ import { VisorCapitulos } from './components/visor-capitulos/visor-capitulos';
     FormsModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatListModule
+    MatListModule,
+    MatProgressSpinnerModule,
 
   ],
   providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoadingInterceptor,
+      multi: true
+    },
     provideBrowserGlobalErrorListeners()
   ],
   bootstrap: [App]

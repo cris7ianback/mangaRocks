@@ -1,6 +1,15 @@
+const path = require('path');
+const fs = require('fs');
 const { db } = require('../db/connection');
 
 let mangaHandlersRegistered = false;
+
+function sanitizarNombre(nombre) {
+    return nombre
+        .replace(/[<>:"/\\|?*]/g, '')   // elimina caracteres no válidos
+        .replace(/\s+/g, '')            // elimina espacios
+        .trim();
+}
 
 function registerMangaHandlers(ipcMain) {
     if (mangaHandlersRegistered) return;
@@ -13,6 +22,9 @@ function registerMangaHandlers(ipcMain) {
         return new Promise((resolve, reject) => {
             const { titulo, autor, descripcion, añoPublicacion, genero, portada } = manga;
 
+            const tituloSanitizado = sanitizarNombre(titulo);
+            const carpetaManga = path.resolve(__dirname, '../archivos', tituloSanitizado);
+
             // Verificar si ya existe
             db.get(`SELECT id FROM mangas WHERE titulo = ?`, [titulo], (err, row) => {
                 if (err) return reject(err);
@@ -20,12 +32,22 @@ function registerMangaHandlers(ipcMain) {
                     return resolve({ success: false, message: 'El manga ya existe' });
                 }
 
+                // Crear carpeta si no existe
+                if (!fs.existsSync(carpetaManga)) {
+                    fs.mkdirSync(carpetaManga, { recursive: true });
+                    console.log('📁 Carpeta creada para manga:', carpetaManga);
+                }
+
                 db.run(`INSERT INTO mangas (titulo, autor, descripcion, añoPublicacion, genero, portada) 
                         VALUES (?, ?, ?, ?, ?, ?)`,
                     [titulo, autor, descripcion, añoPublicacion, genero, portada],
                     function (err) {
                         if (err) reject(err);
-                        else resolve({ success: true, id: this.lastID });
+                        else resolve({
+                            success: true,
+                            id: this.lastID,
+                            carpeta: carpetaManga
+                        });
                     }
                 );
             });

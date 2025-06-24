@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class LoginComponent {
   username: string = 'admin';
-  password: string = 'admin123';
+  password: string = '1234';
   message: string = '';
 
   constructor(
@@ -32,7 +32,7 @@ export class LoginComponent {
         this.snackBar.open('Bienvenido', 'Cerrar', { duration: 2000 });
         this.router.navigate(['/dashboard']);
       } else {
-        this.message = res.message || 'Credenciales incorrectas';
+        this.message = res.message ?? 'Credenciales incorrectas';
       }
     } catch (err) {
       console.error('Error login:', err);

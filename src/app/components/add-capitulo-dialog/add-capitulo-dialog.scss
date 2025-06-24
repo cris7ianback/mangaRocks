@@ -1,0 +1,54 @@
+.titulo-form {
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--mat-primary-700, #1976d2);
+    text-align: center;
+}
+
+.form-capitulo {
+    max-width: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-field {
+    width: 100%;
+}
+
+.file-input-container {
+    display: flex;
+    justify-content: center;
+}
+
+.file-label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #e3f2fd;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    color: #1565c0;
+    transition: background-color 0.3s;
+    user-select: none;
+    box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+}
+
+.file-label:hover {
+    background-color: #bbdefb;
+}
+
+.btn-guardar {
+    width: 100%;
+    font-weight: 600;
+    padding: 12px 0;
+    box-shadow: 0 4px 10px rgb(25 118 210 / 0.4);
+    transition: box-shadow 0.3s;
+}
+
+.btn-guardar:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgb(25 118 210 / 0.6);
+}

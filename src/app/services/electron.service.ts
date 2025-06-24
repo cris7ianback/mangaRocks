@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { LoadingService } from './loading.service';
 
 export interface Manga {
     titulo: string;
@@ -15,8 +16,7 @@ export interface Capitulo {
     mangaId: number;
     numero: number;
     titulo: string;
-    archivo: string;         // nuevo campo para base64
-    // Si ya no usas 'contenido', elimínalo; o si lo usas distinto, manténlo aparte.
+    archivo: string; // base64
 }
 
 export interface LoginCredentials {
@@ -31,63 +31,100 @@ export class ElectronService {
 
     ipcRenderer: any;
 
-    constructor() {
+    constructor(private readonly loadingService: LoadingService) {
         if ((window as any).require) {
             try {
                 this.ipcRenderer = (window as any).require('electron').ipcRenderer;
-            } catch (e) {
+            } catch {
                 console.warn('Electron\'s IPC was not loaded');
             }
         }
     }
+
     private get api() {
         if (window.electronAPI) return window.electronAPI;
         throw new Error('electronAPI no está disponible');
     }
 
-    login(credentials: LoginCredentials): Promise<{ success: boolean; message?: string }> {
-        return this.api.login(credentials);
+    async login(credentials: LoginCredentials): Promise<{ success: boolean; message?: string }> {
+        this.loadingService.show();
+        try {
+            return await this.api.login(credentials);
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
-    obtenerMangas(): Promise<Manga[]> {
-        return this.api.obtenerMangas();
+    async obtenerMangas(): Promise<Manga[]> {
+        this.loadingService.show();
+        try {
+            return await this.api.obtenerMangas();
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
-    guardarManga(manga: Manga): Promise<{ success: boolean; id?: number }> {
-        return this.api.guardarManga(manga);
+    async guardarManga(manga: Manga): Promise<{ success: boolean; id?: number }> {
+        this.loadingService.show();
+        try {
+            return await this.api.guardarManga(manga);
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
-    obtenerCapitulos(mangaId: number): Promise<Capitulo[]> {
-        return this.api.obtenerCapitulos(mangaId);
+    async obtenerCapitulos(mangaId: number): Promise<Capitulo[]> {
+        this.loadingService.show();
+        try {
+            return await this.api.obtenerCapitulos(mangaId);
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
-    guardarCapitulo(capitulo: Capitulo): Promise<{ success: boolean; id?: number }> {
-        return this.api.guardarCapitulo(capitulo);
+    async guardarCapitulo(capitulo: Capitulo): Promise<{ success: boolean; id?: number }> {
+        this.loadingService.show();
+        try {
+            return await this.api.guardarCapitulo(capitulo);
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
-    eliminarManga(id: number): Promise<{ success: boolean }> {
-        return this.api.eliminarManga(id);
+    async eliminarManga(id: number): Promise<{ success: boolean }> {
+        this.loadingService.show();
+        try {
+            return await this.api.eliminarManga(id);
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
     async eliminarCapitulo(id: number): Promise<{ success: boolean }> {
-        return window.electronAPI.eliminarCapitulo(id);
+        this.loadingService.show();
+        try {
+            return await this.api.eliminarCapitulo(id);
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
-    extraerPaginasDesdeArchivo(archivoPath: string): Promise<string[]> {
-        return this.api.extraerPaginasDesdeArchivo(archivoPath);
+    async extraerPaginasDesdeArchivo(archivoPath: string): Promise<string[]> {
+        this.loadingService.show();
+        try {
+            return await this.api.extraerPaginasDesdeArchivo(archivoPath);
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
-    actualizarManga(manga: Manga): Promise<any> {
-        return window.electronAPI.actualizarManga(manga);
+    async actualizarManga(manga: Manga): Promise<any> {
+        this.loadingService.show();
+        try {
+            return await this.api.actualizarManga(manga);
+        } finally {
+            this.loadingService.hide();
+        }
     }
 
-
-    // Puedes agregar otros métodos que tengas en electronAPI aquí, por ejemplo:
-    // obtenerMangas(): Promise<Manga[]> {
-    //   return this.api.obtenerMangas();
-    // }
-
-    // eliminarManga(id: number): Promise<{ success: boolean }> {
-    //   return this.api.eliminarManga(id);
-    // }
 }
