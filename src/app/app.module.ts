@@ -24,6 +24,7 @@ import { VisorCapitulos } from './components/visor-capitulos/visor-capitulos';
 import { LoadingOverlay } from './shared/loading-overlay/loading-overlay';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
+import { AddMuchosCapitulosDialog } from './components/add-muchos-capitulos-dialog/add-muchos-capitulos-dialog';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
     MangaDetalle,
     AddCapituloDialog,
     VisorCapitulos,
-    LoadingOverlay
+    LoadingOverlay,
+    AddMuchosCapitulosDialog
   ],
   imports: [
     BrowserModule,

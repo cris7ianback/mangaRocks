@@ -16,6 +16,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     eliminarCapitulo: (capituloId) => ipcRenderer.invoke('capitulo-delete', capituloId),
     extraerPaginasDesdeArchivo: (archivoPath) => ipcRenderer.invoke('extraerPaginasDesdeArchivo', archivoPath),
 
+    // Agregar muchos capítulos a la vez
+    agregarMuchosCapitulos: (capitulos) => ipcRenderer.invoke('capitulos-agregar-muchos', capitulos),
+
+
     // Abrir archivo externo si se guarda ruta en disco:
     abrirArchivo: (ruta) => shell.openPath(ruta)
 });

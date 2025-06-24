@@ -4,6 +4,7 @@ import { ElectronService } from '../../services/electron.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AddCapituloDialog } from '../add-capitulo-dialog/add-capitulo-dialog';
 import { VisorCapitulos } from '../visor-capitulos/visor-capitulos';
+import { AddMuchosCapitulosDialog } from '../add-muchos-capitulos-dialog/add-muchos-capitulos-dialog';
 
 @Component({
   selector: 'app-manga-detalle',
@@ -185,11 +186,6 @@ export class MangaDetalle implements OnInit {
   }
 
 
-
-
-
-
-
   cerrarVisor() {
     this.visorAbierto = false;
     if (this.capituloSeleccionado) {
@@ -226,4 +222,25 @@ export class MangaDetalle implements OnInit {
       console.error('Error al cargar el título del manga:', error);
     }
   }
+
+
+  abrirDialogoAgregarMuchosCapitulos() {
+    const dialogRef = this.dialog.open(AddMuchosCapitulosDialog, {
+      width: '600px',
+      data: { mangaId: this.mangaId }
+    });
+
+    dialogRef.afterClosed().subscribe(async capitulosNuevos => {
+      if (capitulosNuevos && capitulosNuevos.length > 0) {
+        try {
+          console.log('Capítulos a enviar:', capitulosNuevos);
+          await this.electronService.agregarMuchosCapitulos(capitulosNuevos);
+          await this.cargarCapitulos();
+        } catch (error) {
+          console.error('Error guardando capítulos múltiples:', error);
+        }
+      }
+    });
+  }
+
 }

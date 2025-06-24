@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Agregar varios capítulos</h1>
+
+<div mat-dialog-content>
+    <input type="file" multiple (change)="onFileSelected($event)" accept=".cbr,.cbz,.zip" />
+    <p *ngIf="archivos.length > 0">{{ archivos.length }} archivo(s) seleccionado(s)</p>
+</div>
+
+<div mat-dialog-actions>
+    <button mat-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" [disabled]="archivos.length === 0" (click)="agregar()">Agregar</button>
+</div>

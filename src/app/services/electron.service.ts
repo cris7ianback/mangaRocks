@@ -127,4 +127,14 @@ export class ElectronService {
         }
     }
 
+    async agregarMuchosCapitulos(capitulos: Capitulo[]): Promise<{ success: boolean; insertedCount: number }> {
+        this.loadingService.show();
+        try {
+            return await this.api.agregarMuchosCapitulos(capitulos);  // <--- aquí await
+        } finally {
+            this.loadingService.hide();
+        }
+    }
+
+
 }

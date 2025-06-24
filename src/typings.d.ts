@@ -14,6 +14,9 @@ declare global {
             extraerPaginasDesdeBase64: (archivoBase64: string) => Promise<string[]>;
             extraerPaginasDesdeArchivo: (archivoPath: string) => Promise<string[]>;
             actualizarManga: (manga: any) => Promise<{ success: boolean; changes?: number }>;
+
+            agregarMuchosCapitulos: (capitulos: any[]) => Promise<{ success: boolean; insertedCount: number }>;
+            
         };
     }
 }

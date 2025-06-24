@@ -3,9 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
-const { db } = require('../db/connection');
+const { db } = require('../db/connection'); // Importar db al inicio
 const { guardarArchivoCBR } = require('../utils/fileHelper');
-const { app, ipcMain } = require('electron');  // <--- Aquí importa ipcMain
+const { app, ipcMain } = require('electron');
 const { path7za } = require('7zip-bin');
 
 // Ruta base donde se guardan los archivos .cbr (ajusta según tu estructura)
@@ -35,8 +35,6 @@ function listarArchivosRecursivo(dir, extensiones) {
     });
     return resultados;
 }
-
-
 
 function extraerPaginasDesdeArchivo(archivoPath) {
     console.log('🗂 [extraerPaginasDesdeArchivo] Archivo recibido:', archivoPath);
@@ -93,7 +91,38 @@ function extraerPaginasDesdeArchivo(archivoPath) {
     });
 }
 
+// Función para insertar muchos capítulos en la BD
+function insertarMuchosCapitulosEnBD(capitulos) {
+    return new Promise((resolve, reject) => {
+        if (!Array.isArray(capitulos) || capitulos.length === 0) {
+            return resolve([]);
+        }
 
+        const stmt = db.prepare('INSERT INTO capitulos (mangaId, numero, titulo, archivoPath) VALUES (?, ?, ?, ?)');
+        const results = [];
+
+        db.serialize(() => {
+            db.run("BEGIN TRANSACTION");
+            try {
+                for (const capitulo of capitulos) {
+                    stmt.run([capitulo.mangaId, capitulo.numero, capitulo.titulo, capitulo.archivoPath], function (err) {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        results.push({ id: this.lastID });
+                    });
+                }
+                db.run("COMMIT");
+                stmt.finalize();
+                resolve(results);
+            } catch (e) {
+                db.run("ROLLBACK");
+                reject(e);
+            }
+        });
+    });
+}
 
 function registerCapituloHandlers(ipcMain) {
     ipcMain.handle('capitulo-list', async (event, mangaId) => {
@@ -151,21 +180,17 @@ function registerCapituloHandlers(ipcMain) {
 
     ipcMain.handle('capitulo-delete', async (event, capituloId) => {
         return new Promise((resolve, reject) => {
-            // Primero obtener el path del archivo a borrar
             db.get('SELECT archivoPath FROM capitulos WHERE id = ?', [capituloId], (err, row) => {
                 if (err) return reject(err);
                 if (!row) return reject(new Error('Capítulo no encontrado'));
 
                 const archivoPath = row.archivoPath;
 
-                // Borrar archivo en disco si existe
                 fs.unlink(archivoPath, (fsErr) => {
                     if (fsErr && fsErr.code !== 'ENOENT') {
                         console.warn('No se pudo borrar archivo:', archivoPath, fsErr.message);
-                        // No bloqueamos la eliminación en BD, solo avisamos
                     }
 
-                    // Ahora borrar la fila en BD
                     db.run('DELETE FROM capitulos WHERE id = ?', [capituloId], function (dbErr) {
                         if (dbErr) reject(dbErr);
                         else resolve({ success: true });
@@ -175,11 +200,10 @@ function registerCapituloHandlers(ipcMain) {
         });
     });
 
-
     ipcMain.handle('extraerPaginasDesdeArchivo', async (event, archivoPath) => {
         console.log('📥 extraerPaginasDesdeArchivo llamado con:', archivoPath);
 
-        archivoPath = decodeURI(archivoPath);  // 👈 muy importante si usas rutas codificadas
+        archivoPath = decodeURI(archivoPath);
         let rutaCompleta = path.isAbsolute(archivoPath)
             ? archivoPath
             : path.join(baseArchivosPath, archivoPath);
@@ -212,7 +236,15 @@ function registerCapituloHandlers(ipcMain) {
         }
     });
 
-
+    ipcMain.handle('capitulos-agregar-muchos', async (event, capitulos) => {
+        try {
+            const insertResults = await insertarMuchosCapitulosEnBD(capitulos);
+            return { success: true, insertedCount: insertResults.length };
+        } catch (error) {
+            console.error('Error agregando muchos capítulos:', error);
+            throw error;
+        }
+    });
 }
 
 module.exports = { registerCapituloHandlers };
