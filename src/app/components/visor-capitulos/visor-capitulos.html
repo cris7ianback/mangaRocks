@@ -7,7 +7,7 @@
 
     <div class="pagina-container">
         <img [src]="paginas[paginaActual]" (load)="onImagenCargada($event)" class="pagina-img"
-            [class.animar]="animarImagen" [class.horizontal]="esHorizontal" alt="Página {{ paginaActual + 1 }}" />
+            [class.animar]="animarImagen" alt="Página {{ paginaActual + 1 }}" />
     </div>
 
     <button class="btn flecha-btn derecha" (click)="siguiente()" [disabled]="paginaActual === paginas.length - 1">

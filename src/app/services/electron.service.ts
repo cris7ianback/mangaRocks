@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { LoadingService } from './loading.service';
+import { BehaviorSubject } from 'rxjs';
 
 export interface Manga {
     titulo: string;
@@ -16,7 +17,7 @@ export interface Capitulo {
     mangaId: number;
     numero: number;
     titulo: string;
-    archivo: string; // base64
+    archivo: ArrayBuffer;
 }
 
 export interface LoginCredentials {
@@ -30,11 +31,21 @@ export interface LoginCredentials {
 export class ElectronService {
 
     ipcRenderer: any;
+    progresoCarga$ = new BehaviorSubject<{ total: number, procesados: number, titulo: string } | null>(null);
 
-    constructor(private readonly loadingService: LoadingService) {
+    constructor(private loadingService: LoadingService, private zone: NgZone) {
         if ((window as any).require) {
             try {
                 this.ipcRenderer = (window as any).require('electron').ipcRenderer;
+
+                // Escuchar eventos de progreso
+                this.ipcRenderer.on('progreso-carga-capitulos', (event: any, data: any) => {
+                    // NgZone para actualizar en Angular zone
+                    this.zone.run(() => {
+                        this.progresoCarga$.next(data);
+                    });
+                });
+
             } catch {
                 console.warn('Electron\'s IPC was not loaded');
             }
@@ -129,8 +140,11 @@ export class ElectronService {
 
     async agregarMuchosCapitulos(capitulos: Capitulo[]): Promise<{ success: boolean; insertedCount: number }> {
         this.loadingService.show();
+        this.progresoCarga$.next({ total: capitulos.length, procesados: 0, titulo: '' });
         try {
-            return await this.api.agregarMuchosCapitulos(capitulos);  // <--- aquí await
+            const result = await this.api.agregarMuchosCapitulos(capitulos);
+            this.progresoCarga$.next(null); // limpiar progreso
+            return result;
         } finally {
             this.loadingService.hide();
         }

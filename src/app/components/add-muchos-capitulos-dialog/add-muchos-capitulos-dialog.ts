@@ -8,8 +8,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./add-muchos-capitulos-dialog.scss']
 })
 export class AddMuchosCapitulosDialog {
-
   archivos: File[] = [];
+  progreso: { total: number; procesados: number; titulo: string } | null = null;
 
   constructor(
     public dialogRef: MatDialogRef<AddMuchosCapitulosDialog>,
@@ -23,7 +23,7 @@ export class AddMuchosCapitulosDialog {
   }
 
   agregar() {
-    // Devuelve la lista de archivos al componente que abrió el diálogo
+    // Devuelve la lista de archivos y cierra el diálogo
     this.dialogRef.close(this.archivos);
   }
 
@@ -31,3 +31,5 @@ export class AddMuchosCapitulosDialog {
     this.dialogRef.close(null);
   }
 }
+
+

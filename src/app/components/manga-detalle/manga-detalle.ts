@@ -59,8 +59,6 @@ export class MangaDetalle implements OnInit {
     }
   }
 
-
-
   abrirDialogoAgregarCapitulo() {
     const dialogRef = this.dialog.open(AddCapituloDialog, {
       width: '500px',
@@ -135,6 +133,58 @@ export class MangaDetalle implements OnInit {
     }
   }
 
+  // async abrirVisor(capitulo: any) {
+  //   this.capituloSeleccionado = capitulo;
+
+  //   if (capitulo.archivoPath) {
+  //     try {
+  //       const paginas = await this.electronService.extraerPaginasDesdeArchivo(capitulo.archivoPath);
+  //       this.paginas = paginas.map(p => {
+  //         let path = p.replace(/^localfile:\/\//, '');
+  //         path = path.replace(/\\/g, '/');
+  //         return 'localfile://' + encodeURI(path);
+  //       });
+
+  //       // Cargar la última página guardada o 0 si no existe
+  //       const paginaGuardada = localStorage.getItem(`paginaActual_${capitulo.id}`);
+  //       this.paginaActual = paginaGuardada ? +paginaGuardada : 0;
+
+  //       // Abrir diálogo
+  //       const dialogRef = this.dialog.open(VisorCapitulos, {
+  //         data: { paginas: this.paginas, paginaActual: this.paginaActual, capituloId: capitulo.id },
+  //         panelClass: 'visor-dialog',
+  //         autoFocus: false,
+  //         disableClose: false,
+  //         maxWidth: '100vw',
+  //         maxHeight: '100vh'
+  //       });
+
+  //       // Al cerrar el diálogo actualizar la miniatura con la página guardada
+  //       dialogRef.afterClosed().subscribe(() => {
+  //         const paginaGuardada = localStorage.getItem(`paginaActual_${capitulo.id}`);
+  //         if (paginaGuardada !== null) {
+  //           this.paginaActual = +paginaGuardada;
+
+  //           // Actualizar miniatura para ese capítulo con la imagen guardada
+  //           this.capitulos = this.capitulos.map(c => {
+  //             if (c.id === capitulo.id) {
+  //               return {
+  //                 ...c,
+  //                 miniatura: this.paginas[this.paginaActual] // actualiza miniatura
+  //               };
+  //             }
+  //             return c;
+  //           });
+  //         }
+  //       });
+  //     } catch (error) {
+  //       console.error('Error extrayendo páginas:', error);
+  //       this.paginas = [];
+  //       this.paginaActual = 0;
+  //     }
+  //   }
+  // }
+
   async abrirVisor(capitulo: any) {
     this.capituloSeleccionado = capitulo;
 
@@ -147,30 +197,31 @@ export class MangaDetalle implements OnInit {
           return 'localfile://' + encodeURI(path);
         });
 
-        // Cargar la última página guardada o 0 si no existe
+        // Guardar en localStorage para poder usar miniatura luego
+        localStorage.setItem(`paginas_${capitulo.id}`, JSON.stringify(this.paginas));
+
         const paginaGuardada = localStorage.getItem(`paginaActual_${capitulo.id}`);
         this.paginaActual = paginaGuardada ? +paginaGuardada : 0;
 
-        // Abrir diálogo
         const dialogRef = this.dialog.open(VisorCapitulos, {
-          data: { paginas: this.paginas, paginaActual: this.paginaActual, capituloId: capitulo.id, },
-          width: '70vw',
-          maxWidth: '750px',
-
+          data: { paginas: this.paginas, paginaActual: this.paginaActual, capituloId: capitulo.id },
+          panelClass: 'visor-dialog',
+          autoFocus: false,
+          disableClose: false,
+          maxWidth: '100vw',
+          maxHeight: '100vh'
         });
 
-        // Al cerrar el diálogo actualizar la miniatura con la página guardada
         dialogRef.afterClosed().subscribe(() => {
           const paginaGuardada = localStorage.getItem(`paginaActual_${capitulo.id}`);
           if (paginaGuardada !== null) {
             this.paginaActual = +paginaGuardada;
 
-            // Actualizar miniatura para ese capítulo con la imagen guardada
             this.capitulos = this.capitulos.map(c => {
               if (c.id === capitulo.id) {
                 return {
                   ...c,
-                  miniatura: this.paginas[this.paginaActual] // actualiza miniatura
+                  miniatura: this.paginas[this.paginaActual]
                 };
               }
               return c;
@@ -224,23 +275,64 @@ export class MangaDetalle implements OnInit {
   }
 
 
+  // Función para leer varios archivos como ArrayBuffer
+  leerArchivosComoBuffers(files: File[]): Promise<ArrayBuffer[]> {
+    return Promise.all(
+      files.map(file =>
+        new Promise<ArrayBuffer>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as ArrayBuffer);
+          reader.onerror = () => reject(new Error(`Error leyendo archivo ${file.name}`));
+          reader.readAsArrayBuffer(file);
+        })
+      )
+    );
+  }
+
   abrirDialogoAgregarMuchosCapitulos() {
+    console.log('[🟡] Abriendo diálogo para agregar múltiples capítulos...');
+
     const dialogRef = this.dialog.open(AddMuchosCapitulosDialog, {
       width: '600px',
       data: { mangaId: this.mangaId }
     });
 
-    dialogRef.afterClosed().subscribe(async capitulosNuevos => {
-      if (capitulosNuevos && capitulosNuevos.length > 0) {
-        try {
-          console.log('Capítulos a enviar:', capitulosNuevos);
-          await this.electronService.agregarMuchosCapitulos(capitulosNuevos);
-          await this.cargarCapitulos();
-        } catch (error) {
-          console.error('Error guardando capítulos múltiples:', error);
-        }
+    dialogRef.afterClosed().subscribe(async (capitulosNuevos: File[] | null) => {
+      console.log('[🔵] Diálogo cerrado');
+
+      if (!capitulosNuevos || capitulosNuevos.length === 0) {
+        console.log('[⚪] No se seleccionaron archivos.');
+        return;
+      }
+
+      console.log(`[🟢] Se seleccionaron ${capitulosNuevos.length} archivos:`);
+
+      try {
+        // Leer todos los archivos como ArrayBuffer usando el método de la clase
+        const buffers = await this.leerArchivosComoBuffers(capitulosNuevos);
+
+        // Preparar datos para enviar al backend
+        const capitulosParaEnviar = capitulosNuevos.map((file, i) => ({
+          mangaId: this.mangaId,
+          numero: 0,   // Número temporal, el backend puede recalcularlo
+          titulo: file.name,
+          archivo: buffers[i]  // cambia según el nombre que use tu backend
+        }));
+
+        console.log('[🟡] Enviando capítulos al servicio Electron...');
+        const resultado = await this.electronService.agregarMuchosCapitulos(capitulosParaEnviar);
+
+        console.log('[✅] Capítulos enviados correctamente:', resultado);
+
+        console.log('[🔄] Cargando capítulos actualizados...');
+        await this.cargarCapitulos();
+        console.log('[✅] Capítulos actualizados.');
+
+      } catch (error) {
+        console.error('[❌] Error guardando capítulos múltiples:', error);
       }
     });
   }
+
 
 }

@@ -19,7 +19,7 @@ function getNombreManga(mangaId) {
     });
 }
 
-async function guardarArchivoCBR(mangaId, nombreOriginal, bufferBase64) {
+async function guardarArchivoCBR(mangaId, nombreOriginal, bufferBinario) {
     const titulo = await getNombreManga(mangaId);
     const tituloSanitizado = sanitizarNombre(titulo);
 
@@ -29,10 +29,9 @@ async function guardarArchivoCBR(mangaId, nombreOriginal, bufferBase64) {
     const nombreArchivoSanitizado = sanitizarNombre(nombreOriginal);
     const rutaFinal = path.join(carpeta, nombreArchivoSanitizado);
 
-    const buffer = Buffer.from(bufferBase64, 'base64');
-
+    // Aquí ya bufferBinario es un Buffer, no string base64
     return new Promise((resolve, reject) => {
-        fs.writeFile(rutaFinal, buffer, err => {
+        fs.writeFile(rutaFinal, bufferBinario, err => {
             if (err) return reject(err);
             resolve(rutaFinal);
         });

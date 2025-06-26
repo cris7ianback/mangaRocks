@@ -11,7 +11,6 @@ export class VisorCapitulos {
   paginas: string[];
   paginaActual: number;
   animarImagen = false;
-  esHorizontal = false;
 
   constructor(
     public dialogRef: MatDialogRef<VisorCapitulos>,
@@ -23,7 +22,6 @@ export class VisorCapitulos {
     this.dialogRef.beforeClosed().subscribe(() => {
       localStorage.setItem(`paginaActual_${data.capituloId}`, this.paginaActual.toString());
 
-      // Marcar como leído si terminó el capítulo
       if (this.paginaActual >= this.paginas.length - 1) {
         localStorage.setItem(`leido_${this.data.capituloId}`, 'true');
       }
@@ -50,8 +48,6 @@ export class VisorCapitulos {
 
   onImagenCargada(event: Event) {
     this.animarImagen = false;
-    const img = event.target as HTMLImageElement;
-    this.esHorizontal = img.naturalWidth > img.naturalHeight;
   }
 
   @HostListener('window:keydown', ['$event'])

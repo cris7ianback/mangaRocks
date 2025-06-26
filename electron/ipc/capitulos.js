@@ -7,6 +7,7 @@ const { db } = require('../db/connection'); // Importar db al inicio
 const { guardarArchivoCBR } = require('../utils/fileHelper');
 const { app, ipcMain } = require('electron');
 const { path7za } = require('7zip-bin');
+const { promisify } = require('util');
 
 // Ruta base donde se guardan los archivos .cbr (ajusta según tu estructura)
 const baseArchivosPath = path.resolve(__dirname, '..', 'archivos');
@@ -92,32 +93,68 @@ function extraerPaginasDesdeArchivo(archivoPath) {
 }
 
 // Función para insertar muchos capítulos en la BD
+// function insertarMuchosCapitulosEnBD(capitulos) {
+//     return new Promise((resolve, reject) => {
+//         if (!Array.isArray(capitulos) || capitulos.length === 0) {
+//             return resolve([]);
+//         }
+
+//         const stmt = db.prepare('INSERT INTO capitulos (mangaId, numero, titulo, archivoPath) VALUES (?, ?, ?, ?)');
+//         const results = [];
+
+//         db.serialize(() => {
+//             db.run("BEGIN TRANSACTION");
+//             try {
+//                 for (const capitulo of capitulos) {
+//                     stmt.run([capitulo.mangaId, capitulo.numero, capitulo.titulo, capitulo.archivoPath], function (err) {
+//                         if (err) {
+//                             reject(err);
+//                             return;
+//                         }
+//                         results.push({ id: this.lastID });
+//                     });
+//                 }
+//                 db.run("COMMIT");
+//                 stmt.finalize();
+//                 resolve(results);
+//             } catch (e) {
+//                 db.run("ROLLBACK");
+//                 reject(e);
+//             }
+//         });
+//     });
+// }
+
 function insertarMuchosCapitulosEnBD(capitulos) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         if (!Array.isArray(capitulos) || capitulos.length === 0) {
             return resolve([]);
         }
 
         const stmt = db.prepare('INSERT INTO capitulos (mangaId, numero, titulo, archivoPath) VALUES (?, ?, ?, ?)');
+        const runAsync = promisify(stmt.run.bind(stmt));
         const results = [];
 
-        db.serialize(() => {
-            db.run("BEGIN TRANSACTION");
+        db.serialize(async () => {
             try {
+                await new Promise((res, rej) => db.run("BEGIN TRANSACTION", (err) => err ? rej(err) : res()));
+
                 for (const capitulo of capitulos) {
-                    stmt.run([capitulo.mangaId, capitulo.numero, capitulo.titulo, capitulo.archivoPath], function (err) {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                        results.push({ id: this.lastID });
-                    });
+                    try {
+                        const result = await runAsync(capitulo.mangaId, capitulo.numero, capitulo.titulo, capitulo.archivoPath);
+                        results.push({ id: stmt.lastID });
+                    } catch (err) {
+                        await new Promise((res) => db.run("ROLLBACK", res));
+                        return reject(err);
+                    }
                 }
-                db.run("COMMIT");
+
+                await new Promise((res, rej) => db.run("COMMIT", (err) => err ? rej(err) : res()));
                 stmt.finalize();
                 resolve(results);
+
             } catch (e) {
-                db.run("ROLLBACK");
+                await new Promise((res) => db.run("ROLLBACK", res));
                 reject(e);
             }
         });
@@ -145,7 +182,8 @@ function registerCapituloHandlers(ipcMain) {
     ipcMain.handle('guardarCapitulo', async (event, capitulo) => {
         const { mangaId, titulo, archivoNombreOriginal, archivoBuffer } = capitulo;
         try {
-            const rutaFinal = await guardarArchivoCBR(mangaId, archivoNombreOriginal, archivoBuffer);
+            // archivoBuffer es Buffer o Uint8Array
+            const rutaFinal = await guardarArchivoCBR(mangaId, archivoNombreOriginal, Buffer.from(archivoBuffer));
 
             console.log('📁 Archivo guardado en:', rutaFinal);
 
@@ -236,15 +274,139 @@ function registerCapituloHandlers(ipcMain) {
         }
     });
 
+    // ipcMain.handle('capitulos-agregar-muchos', async (event, capitulos) => {
+    //     const capitulosParaBD = [];
+
+    //     try {
+    //         for (const cap of capitulos) {
+    //             const { mangaId, titulo, archivo } = cap; // archivo viene como Uint8Array o Buffer
+
+    //             const bufferArchivo = Buffer.isBuffer(archivo) ? archivo : Buffer.from(archivo);
+
+    //             const rutaFinal = await guardarArchivoCBR(mangaId, titulo, bufferArchivo);
+
+    //             const nextNum = await new Promise((resolve, reject) => {
+    //                 db.get('SELECT MAX(numero) as maxNum FROM capitulos WHERE mangaId = ?', [mangaId], (err, row) => {
+    //                     if (err) return reject(err);
+    //                     resolve(row?.maxNum != null ? row.maxNum + 1 : 1);
+    //                 });
+    //             });
+
+    //             capitulosParaBD.push({
+    //                 mangaId,
+    //                 numero: nextNum,
+    //                 titulo,
+    //                 archivoPath: rutaFinal
+    //             });
+    //         }
+
+    //         const insertResults = await insertarMuchosCapitulosEnBD(capitulosParaBD);
+
+    //         return { success: true, insertedCount: insertResults.length };
+
+    //     } catch (error) {
+    //         console.error('Error agregando muchos capítulos:', error);
+    //         throw error;
+    //     }
+    // });
+
+    // ipcMain.handle('capitulos-agregar-muchos', async (event, capitulos) => {
+    //     const capitulosParaBD = [];
+
+    //     console.log(`[IPC] Recibidos ${capitulos.length} capítulos para agregar.`);
+
+    //     try {
+    //         for (const [index, cap] of capitulos.entries()) {
+    //             const { mangaId, titulo, archivo } = cap;
+
+    //             console.log(`[IPC] Procesando capítulo ${index + 1}/${capitulos.length}: "${titulo}"`);
+
+    //             try {
+    //                 const bufferArchivo = Buffer.isBuffer(archivo) ? archivo : Buffer.from(archivo);
+
+    //                 const rutaFinal = await guardarArchivoCBR(mangaId, titulo, bufferArchivo);
+
+    //                 console.log(`[IPC] Archivo guardado en: ${rutaFinal}`);
+
+    //                 const nextNum = await new Promise((resolve, reject) => {
+    //                     db.get('SELECT MAX(numero) as maxNum FROM capitulos WHERE mangaId = ?', [mangaId], (err, row) => {
+    //                         if (err) {
+    //                             console.error('[IPC] Error al obtener número siguiente:', err);
+    //                             return reject(err);
+    //                         }
+    //                         resolve(row?.maxNum != null ? row.maxNum + 1 : 1);
+    //                     });
+    //                 });
+
+    //                 capitulosParaBD.push({
+    //                     mangaId,
+    //                     numero: nextNum,
+    //                     titulo,
+    //                     archivoPath: rutaFinal
+    //                 });
+
+    //             } catch (errorArchivo) {
+    //                 console.error(`[IPC] Error procesando capítulo "${titulo}":`, errorArchivo);
+    //                 throw errorArchivo; // Opcional: puedes decidir si continuar o abortar todo
+    //             }
+    //         }
+
+    //         console.log('[IPC] Insertando capítulos en la base de datos...');
+    //         const insertResults = await insertarMuchosCapitulosEnBD(capitulosParaBD);
+    //         console.log(`[IPC] Insertados ${insertResults.length} capítulos.`);
+
+    //         return { success: true, insertedCount: insertResults.length };
+
+    //     } catch (error) {
+    //         console.error('[IPC] Error agregando muchos capítulos:', error);
+    //         throw error;
+    //     }
+    // });
+
     ipcMain.handle('capitulos-agregar-muchos', async (event, capitulos) => {
-        try {
-            const insertResults = await insertarMuchosCapitulosEnBD(capitulos);
-            return { success: true, insertedCount: insertResults.length };
-        } catch (error) {
-            console.error('Error agregando muchos capítulos:', error);
-            throw error;
+        const capitulosParaBD = [];
+        const webContents = event.sender;
+
+        for (let i = 0; i < capitulos.length; i++) {
+            const cap = capitulos[i];
+            try {
+                const bufferArchivo = Buffer.isBuffer(cap.archivo) ? cap.archivo : Buffer.from(cap.archivo);
+                const rutaFinal = await guardarArchivoCBR(cap.mangaId, cap.titulo, bufferArchivo);
+
+                const nextNum = await new Promise((resolve, reject) => {
+                    db.get('SELECT MAX(numero) as maxNum FROM capitulos WHERE mangaId = ?', [cap.mangaId], (err, row) => {
+                        if (err) return reject(err);
+                        resolve(row?.maxNum != null ? row.maxNum + 1 : 1);
+                    });
+                });
+
+                capitulosParaBD.push({
+                    mangaId: cap.mangaId,
+                    numero: nextNum,
+                    titulo: cap.titulo,
+                    archivoPath: rutaFinal
+                });
+
+                // Enviar progreso al frontend (índice actual +1 porque es 0-based)
+                webContents.send('progreso-carga-capitulos', {
+                    total: capitulos.length,
+                    procesados: i + 1,
+                    titulo: cap.titulo
+                });
+
+            } catch (error) {
+                console.error(`Error procesando capítulo "${cap.titulo}":`, error);
+                throw error;
+            }
         }
+
+        const insertResults = await insertarMuchosCapitulosEnBD(capitulosParaBD);
+
+        return { success: true, insertedCount: insertResults.length };
     });
+
+
+
 }
 
 module.exports = { registerCapituloHandlers };
