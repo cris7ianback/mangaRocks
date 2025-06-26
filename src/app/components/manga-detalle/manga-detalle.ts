@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddCapituloDialog } from '../add-capitulo-dialog/add-capitulo-dialog';
 import { VisorCapitulos } from '../visor-capitulos/visor-capitulos';
 import { AddMuchosCapitulosDialog } from '../add-muchos-capitulos-dialog/add-muchos-capitulos-dialog';
+import { EditMangaDialog } from '../edit-manga-dialog/edit-manga-dialog';
 
 @Component({
   selector: 'app-manga-detalle',
@@ -133,57 +134,6 @@ export class MangaDetalle implements OnInit {
     }
   }
 
-  // async abrirVisor(capitulo: any) {
-  //   this.capituloSeleccionado = capitulo;
-
-  //   if (capitulo.archivoPath) {
-  //     try {
-  //       const paginas = await this.electronService.extraerPaginasDesdeArchivo(capitulo.archivoPath);
-  //       this.paginas = paginas.map(p => {
-  //         let path = p.replace(/^localfile:\/\//, '');
-  //         path = path.replace(/\\/g, '/');
-  //         return 'localfile://' + encodeURI(path);
-  //       });
-
-  //       // Cargar la última página guardada o 0 si no existe
-  //       const paginaGuardada = localStorage.getItem(`paginaActual_${capitulo.id}`);
-  //       this.paginaActual = paginaGuardada ? +paginaGuardada : 0;
-
-  //       // Abrir diálogo
-  //       const dialogRef = this.dialog.open(VisorCapitulos, {
-  //         data: { paginas: this.paginas, paginaActual: this.paginaActual, capituloId: capitulo.id },
-  //         panelClass: 'visor-dialog',
-  //         autoFocus: false,
-  //         disableClose: false,
-  //         maxWidth: '100vw',
-  //         maxHeight: '100vh'
-  //       });
-
-  //       // Al cerrar el diálogo actualizar la miniatura con la página guardada
-  //       dialogRef.afterClosed().subscribe(() => {
-  //         const paginaGuardada = localStorage.getItem(`paginaActual_${capitulo.id}`);
-  //         if (paginaGuardada !== null) {
-  //           this.paginaActual = +paginaGuardada;
-
-  //           // Actualizar miniatura para ese capítulo con la imagen guardada
-  //           this.capitulos = this.capitulos.map(c => {
-  //             if (c.id === capitulo.id) {
-  //               return {
-  //                 ...c,
-  //                 miniatura: this.paginas[this.paginaActual] // actualiza miniatura
-  //               };
-  //             }
-  //             return c;
-  //           });
-  //         }
-  //       });
-  //     } catch (error) {
-  //       console.error('Error extrayendo páginas:', error);
-  //       this.paginas = [];
-  //       this.paginaActual = 0;
-  //     }
-  //   }
-  // }
 
   async abrirVisor(capitulo: any) {
     this.capituloSeleccionado = capitulo;
@@ -290,7 +240,6 @@ export class MangaDetalle implements OnInit {
   }
 
   abrirDialogoAgregarMuchosCapitulos() {
-    console.log('[🟡] Abriendo diálogo para agregar múltiples capítulos...');
 
     const dialogRef = this.dialog.open(AddMuchosCapitulosDialog, {
       width: '600px',
@@ -335,4 +284,19 @@ export class MangaDetalle implements OnInit {
   }
 
 
+  editarManga(manga: any) {
+    const dialogRef = this.dialog.open(EditMangaDialog, {
+      width: '400px',
+      data: manga
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Aquí llamas a tu ElectronService o servicio para guardar los cambios
+        this.electronService.actualizarManga(result.id, result.nombre, result.descripcion);
+      }
+    });
+
+
+  }
 }

@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>Editar Manga</h1>
+<div mat-dialog-content>
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Nombre</mat-label>
+        <input matInput [(ngModel)]="manga.nombre" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput rows="4" [(ngModel)]="manga.descripcion"></textarea>
+    </mat-form-field>
+</div>
+
+<div mat-dialog-actions align="end">
+    <button mat-button (click)="cancelar()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="guardar()">Guardar</button>
+</div>
