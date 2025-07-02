@@ -1,59 +1,60 @@
-# MangaRocks
+# 📚 Manga Rocks
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.2.
+**Your personal manga library** – Store and read your favorite manga in `.cbr` and `.cbz` formats, with a clean and simple UI.
 
-## Development server
+![App Preview](https://github.com/user-attachments/assets/3b19c2cc-3ca6-428b-b3a3-7385f5e3e434)
 
-To start a local development server, run:
+[![Download](https://img.shields.io/badge/Download-Windows-blue?logo=windows&style=for-the-badge)](https://github.com/cris7ianback/manga-rocks/releases/download/v0.0.0/Manga.Rocks.Setup.0.0.0.exe)
 
-```bash
-ng serve
-```
+---
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🚀 First Version (Beta)
 
-## Code scaffolding
+🎉 First release is now available!  
+Feel free to leave feedback, report bugs, or suggest improvements.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+🧪 **Login for testing**:
 
-```bash
-ng generate component component-name
-```
+User: admin
+Password: admin123
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## 📦 Installer
 
-To build the project run:
+👉 **[Download Manga Rocks Setup v0.0.0 for Windows](https://github.com/cris7ianback/manga-rocks/releases/download/v0.0.0/Manga.Rocks.Setup.0.0.0.exe)**  
+🗂️ File: `Manga.Rocks.Setup.0.0.0.exe`  
+📁 Version: `v0.0.0`  
+📅 Release date: July 2025 (or update with exact date)
 
-```bash
-ng build
-```
+---
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## 🙏 Support / Donations
 
-## Running unit tests
+If you like this project and want to support development, consider making a donation:
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue?logo=paypal&style=for-the-badge)](https://www.paypal.com/donate/?business=46A2TK99A8NAL&no_recurring=0&item_name=Querer+mejorar++lector+de+mangas+%3A%29&currency_code=USD)
 
-```bash
-ng test
-```
+---
 
-## Running end-to-end tests
+## 🛠️ Built With
 
-For end-to-end (e2e) testing, run:
+- Angular  
+- Electron  
+- SQLite  
+- 7zip-bin  
+- Material Design  
 
-```bash
-ng e2e
-```
+---
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## ❤️ Contributions
 
-## Additional Resources
+Suggestions and issues are welcome via [Issues](https://github.com/cris7ianback/manga-rocks/issues)
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+
+## 👨‍💻 Author
+
+**cris7ianback**  
+[GitHub Profile](https://github.com/cris7ianback)
