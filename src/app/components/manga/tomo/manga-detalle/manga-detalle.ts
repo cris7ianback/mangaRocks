@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ElectronService } from '../../services/electron.service';
+
 import { MatDialog } from '@angular/material/dialog';
-import { AddCapituloDialog } from '../add-capitulo-dialog/add-capitulo-dialog';
+
 import { VisorCapitulos } from '../visor-capitulos/visor-capitulos';
-import { AddMuchosCapitulosDialog } from '../add-muchos-capitulos-dialog/add-muchos-capitulos-dialog';
-import { EditMangaDialog } from '../edit-manga-dialog/edit-manga-dialog';
+import { ElectronService } from '../../../../services/electron.service';
+import { AddTomoDialog } from '../../dialogs/add-tomo/add-tomo-dialog';
+import { AddMuchosCapitulosDialog } from '../../dialogs/add-muchos-capitulos/add-muchos-capitulos-dialog';
+import { EditMangaDialog } from '../../dialogs/edit-manga/edit-manga-dialog';
+
 
 @Component({
   selector: 'app-manga-detalle',
@@ -61,7 +64,7 @@ export class MangaDetalle implements OnInit {
   }
 
   abrirDialogoAgregarCapitulo() {
-    const dialogRef = this.dialog.open(AddCapituloDialog, {
+    const dialogRef = this.dialog.open(AddTomoDialog, {
       width: '500px',
       data: { mangaId: this.mangaId }
     });
@@ -293,7 +296,7 @@ export class MangaDetalle implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         // Aquí llamas a tu ElectronService o servicio para guardar los cambios
-        this.electronService.actualizarManga(result.id, result.nombre, result.descripcion);
+        // this.electronService.actualizarManga(result.id, result.nombre, result.descripcion);
       }
     });
 

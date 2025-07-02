@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { Dashboard } from './components/core/dashboard/dashboard';
+import { LoginComponent } from './components/core/login/login';
+import { MangaDetalle } from './components/manga/tomo/manga-detalle/manga-detalle';
 
-import { LoginComponent } from './components/login/login';  // importa tu componente login
-import { Dashboard } from './components/dashboard/dashboard';
-import { MangaDetalle } from './components/manga-detalle/manga-detalle';
+
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' }, // ruta por defecto redirige a login

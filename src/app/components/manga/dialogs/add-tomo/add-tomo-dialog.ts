@@ -2,17 +2,17 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-add-capitulo-dialog',
-  templateUrl: './add-capitulo-dialog.html',
+  selector: 'app-add-tomo-dialog',
+  templateUrl: './add-tomo-dialog.html',
   standalone: false,
-  styleUrls: ['./add-capitulo-dialog.scss']
+  styleUrls: ['./add-tomo-dialog.scss']
 })
-export class AddCapituloDialog {
+export class AddTomoDialog {
   titulo = '';
   archivoSeleccionado: File | null = null;
 
   constructor(
-    public dialogRef: MatDialogRef<AddCapituloDialog>,
+    public dialogRef: MatDialogRef<AddTomoDialog>,
     @Inject(MAT_DIALOG_DATA) public data: { mangaId: number }
   ) { }
 

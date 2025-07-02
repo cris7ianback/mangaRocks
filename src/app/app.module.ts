@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { App } from './app';
-import { LoginComponent } from './components/login/login';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -11,21 +11,26 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Dashboard } from './components/dashboard/dashboard';
-import { MangaCard } from './components/manga-card/manga-card';
-import { MangaDialog } from './components/manga-dialog/manga-dialog';
+
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
-import { ConfirmarEliminacion } from './components/confirmar-eliminacion/confirmar-eliminacion';
-import { MangaDetalle } from './components/manga-detalle/manga-detalle';
-import { AddCapituloDialog } from './components/add-capitulo-dialog/add-capitulo-dialog';
+
 import { MatListModule } from '@angular/material/list';
-import { VisorCapitulos } from './components/visor-capitulos/visor-capitulos';
+
 import { LoadingOverlay } from './shared/loading-overlay/loading-overlay';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
-import { AddMuchosCapitulosDialog } from './components/add-muchos-capitulos-dialog/add-muchos-capitulos-dialog';
-import { EditMangaDialog } from './components/edit-manga-dialog/edit-manga-dialog';
+import { Dashboard } from './components/core/dashboard/dashboard';
+import { LoginComponent } from './components/core/login/login';
+import { AddTomoDialog } from './components/manga/dialogs/add-tomo/add-tomo-dialog';
+import { AddMuchosCapitulosDialog } from './components/manga/dialogs/add-muchos-capitulos/add-muchos-capitulos-dialog';
+import { EditMangaDialog } from './components/manga/dialogs/edit-manga/edit-manga-dialog';
+import { MangaDialog } from './components/manga/dialogs/manga-info-dialog/manga-dialog';
+import { MangaCard } from './components/manga/manga-card/manga-card';
+import { MangaDetalle } from './components/manga/tomo/manga-detalle/manga-detalle';
+import { VisorCapitulos } from './components/manga/tomo/visor-capitulos/visor-capitulos';
+import { ConfirmarEliminacion } from './components/shared/confirmar-eliminacion/confirmar-eliminacion';
+
 
 
 @NgModule({
@@ -37,7 +42,7 @@ import { EditMangaDialog } from './components/edit-manga-dialog/edit-manga-dialo
     MangaDialog,
     ConfirmarEliminacion,
     MangaDetalle,
-    AddCapituloDialog,
+    AddTomoDialog,
     VisorCapitulos,
     LoadingOverlay,
     AddMuchosCapitulosDialog,

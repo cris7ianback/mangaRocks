@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';  // <-- Importa MatSnackBar
-import { MangaDialog } from '../manga-dialog/manga-dialog';
-import { ElectronService, Manga } from '../../services/electron.service';
-import { ConfirmarEliminacion } from '../confirmar-eliminacion/confirmar-eliminacion';
+
 import { Router } from '@angular/router';
+import { Manga, ElectronService } from '../../../services/electron.service';
+import { MangaDialog } from '../../manga/dialogs/manga-info-dialog/manga-dialog';
+import { ConfirmarEliminacion } from '../../shared/confirmar-eliminacion/confirmar-eliminacion';
 
 @Component({
   selector: 'app-dashboard',

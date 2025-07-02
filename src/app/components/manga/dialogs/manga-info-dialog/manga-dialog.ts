@@ -1,7 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ElectronService, Manga } from '../../services/electron.service';
-import { SnackbarService } from '../../services/snackbar.service';
+import { Manga, ElectronService } from '../../../../services/electron.service';
+import { SnackbarService } from '../../../../services/snackbar.service';
+
 
 
 @Component({
@@ -73,8 +74,8 @@ export class MangaDialog implements OnInit {
         this.snackbarService.open(this.id ? 'Manga editado' : 'Manga agregado');
         this.dialogRef.close({ ...manga, id: res.id ?? this.id });
       }
-      else{
-          this.snackbarService.open('Error al guardar manga', 'error');
+      else {
+        this.snackbarService.open('Error al guardar manga', 'error');
       }
     } catch (err) {
       console.error('Error al guardar el manga:', err);

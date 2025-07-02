@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ElectronService } from '../../services/electron.service';
+
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ElectronService } from '../../../services/electron.service';
 
 @Component({
   selector: 'app-login',
