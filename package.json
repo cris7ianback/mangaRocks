@@ -1,6 +1,8 @@
 {
   "name": "manga-rocks",
   "version": "0.0.0",
+  "description": "Aplicación de escritorio para gestionar y leer mangas",
+  "author": "cris7ianback",
   "main": "electron/main.js",
   "scripts": {
     "start": "ng serve",
