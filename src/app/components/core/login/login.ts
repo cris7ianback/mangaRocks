@@ -12,7 +12,7 @@ import { ElectronService } from '../../../services/electron.service';
 })
 export class LoginComponent {
   username: string = 'admin';
-  password: string = '1234';
+  password: string = 'admin123';
   message: string = '';
 
   constructor(
