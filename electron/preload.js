@@ -1,25 +1,32 @@
 const { contextBridge, ipcRenderer, shell } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    // Login (ejemplo)
-    login: (credentials) => ipcRenderer.invoke('login', credentials),
+  // Login (ejemplo)
+  login: (credentials) => ipcRenderer.invoke('login', credentials),
 
-    // Mangas
-    guardarManga: (manga) => ipcRenderer.invoke('manga-create', manga),
-    obtenerMangas: () => ipcRenderer.invoke('manga-list'),
-    eliminarManga: (id) => ipcRenderer.invoke('manga-delete', id),
-    actualizarManga: (manga) => ipcRenderer.invoke('manga-update', manga),
+  // Mangas
+  guardarManga: (manga) => ipcRenderer.invoke('manga-create', manga),
+  obtenerMangas: () => ipcRenderer.invoke('manga-list'),
+  eliminarManga: (id) => ipcRenderer.invoke('manga-delete', id),
+  actualizarManga: (manga) => ipcRenderer.invoke('manga-update', manga),
 
-    // Capítulos
-    obtenerCapitulos: (mangaId) => ipcRenderer.invoke('capitulo-list', mangaId),
-    guardarCapitulo: (capitulo) => ipcRenderer.invoke('guardarCapitulo', capitulo),
-    eliminarCapitulo: (capituloId) => ipcRenderer.invoke('capitulo-delete', capituloId),
-    extraerPaginasDesdeArchivo: (archivoPath) => ipcRenderer.invoke('extraerPaginasDesdeArchivo', archivoPath),
+  // Capítulos
+  obtenerCapitulos: (mangaId) => ipcRenderer.invoke('capitulo-list', mangaId),
+  guardarCapitulo: (capitulo) => ipcRenderer.invoke('guardarCapitulo', capitulo),
+  eliminarCapitulo: (capituloId) => ipcRenderer.invoke('capitulo-delete', capituloId),
+  extraerPaginasDesdeArchivo: (archivoPath) => ipcRenderer.invoke('extraerPaginasDesdeArchivo', archivoPath),
 
-    // Agregar muchos capítulos a la vez
-    agregarMuchosCapitulos: (capitulos) => ipcRenderer.invoke('capitulos-agregar-muchos', capitulos),
+  // Agregar muchos capítulos a la vez
+  agregarMuchosCapitulos: (capitulos) => ipcRenderer.invoke('capitulos-agregar-muchos', capitulos),
+
+  // ✅ Google Drive
+  listarArchivosDrive: (carpetaId) => ipcRenderer.invoke('drive:listar', carpetaId),
+  descargarArchivoDrive: (fileId, nombre) => ipcRenderer.invoke('drive:descargar', { fileId, nombre }),
+
+  listarCarpetasDrive: () => ipcRenderer.invoke('drive:carpetas'),
 
 
-    // Abrir archivo externo si se guarda ruta en disco:
-    abrirArchivo: (ruta) => shell.openPath(ruta)
+
+  // Abrir archivo externo si se guarda ruta en disco:
+  abrirArchivo: (ruta) => shell.openPath(ruta)
 });

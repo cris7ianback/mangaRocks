@@ -30,6 +30,8 @@ import { MangaCard } from './components/manga/manga-card/manga-card';
 import { MangaDetalle } from './components/manga/tomo/manga-detalle/manga-detalle';
 import { VisorCapitulos } from './components/manga/tomo/visor-capitulos/visor-capitulos';
 import { ConfirmarEliminacion } from './components/shared/confirmar-eliminacion/confirmar-eliminacion';
+import { DriveExplorerComponent } from './components/drive/drive-explorer/drive-explorer';
+
 
 
 
@@ -46,7 +48,9 @@ import { ConfirmarEliminacion } from './components/shared/confirmar-eliminacion/
     VisorCapitulos,
     LoadingOverlay,
     AddMuchosCapitulosDialog,
-    EditMangaDialog
+    EditMangaDialog,
+    DriveExplorerComponent
+
   ],
   imports: [
     BrowserModule,

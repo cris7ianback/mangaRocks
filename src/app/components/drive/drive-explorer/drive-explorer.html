@@ -1,0 +1,12 @@
+<div *ngIf="cargando">Cargando...</div>
+
+<label for="carpetas">Selecciona una carpeta de Google Drive:</label>
+<select id="carpetas" [(ngModel)]="carpetaSeleccionadaId" (change)="onCarpetaChange()">
+  <option [value]="null">-- Seleccionar carpeta --</option>
+  <option *ngFor="let c of carpetas" [value]="c.id">{{ c.name }}</option>
+</select>
+
+<h3>Archivos .cbr en la carpeta seleccionada:</h3>
+<ul>
+  <li *ngFor="let archivo of archivos">{{ archivo.name }}</li>
+</ul>
